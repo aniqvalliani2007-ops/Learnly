@@ -121,3 +121,10 @@ Follow these steps to run the application in a local development environment.
 ## 🛡️ License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<p align="center">
+  Designed and developed by <b>Aniq Valliani</b>
+</p>
+
