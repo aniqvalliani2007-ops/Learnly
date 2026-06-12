@@ -1,0 +1,6 @@
+{
+  "project_id": "learnly",
+  "db_url": "postgresql://[user]:[password]@[host]:[port]/[database]",
+  "graphql_url": "[supabase-url]/graphql/v1",
+  "api_url": "[supabase-url]/rest/v1"
+}
