@@ -58,7 +58,7 @@ Ensure the response is strictly valid JSON with no markdown syntax wrapping (no 
       try {
         console.log(`Attempting OpenRouter request with model: ${model}`)
         const response = await axios.post(
-          '/api/openrouter/chat/completions',
+          'https://openrouter.ai/api/v1/chat/completions',
           {
             model: model,
             messages: [
@@ -71,7 +71,7 @@ Ensure the response is strictly valid JSON with no markdown syntax wrapping (no 
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json',
-              'HTTP-Referer': 'https://learnly.edu',
+              'HTTP-Referer': window.location.origin || 'https://learnly-teal.vercel.app',
               'X-Title': 'Learnly App'
             },
             timeout: 25000 // 25 seconds timeout per model attempt
@@ -191,7 +191,7 @@ Answer the student's question clearly, concisely, and with high educational valu
     for (const model of modelsToTry) {
       try {
         const response = await axios.post(
-          '/api/openrouter/chat/completions',
+          'https://openrouter.ai/api/v1/chat/completions',
           {
             model: model,
             messages: messages,
@@ -201,7 +201,7 @@ Answer the student's question clearly, concisely, and with high educational valu
             headers: {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json',
-              'HTTP-Referer': 'https://learnly.edu',
+              'HTTP-Referer': window.location.origin || 'https://learnly-teal.vercel.app',
               'X-Title': 'Learnly App'
             },
             timeout: 15000

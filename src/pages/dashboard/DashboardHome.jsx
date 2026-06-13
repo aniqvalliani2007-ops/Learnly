@@ -21,7 +21,9 @@ import {
   TrendingUp, 
   User,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Menu,
+  X
 } from 'lucide-react'
 
 // Beautiful, native React Markdown-to-HTML renderer for assistant responses
@@ -207,6 +209,8 @@ export default function DashboardHome() {
   const [quizFinished, setQuizFinished] = useState(false)
   const [selectedQuizAnswer, setSelectedQuizAnswer] = useState(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
 
   const chatEndRef = useRef(null)
 
@@ -450,14 +454,55 @@ export default function DashboardHome() {
   return (
     <div className="h-screen w-screen bg-[#080808] text-zinc-300 font-sans flex overflow-hidden relative">
       
+      {/* Mobile overlay */}
+      {(isSidebarOpen || isRightPanelOpen) && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
+          onClick={() => {
+            setIsSidebarOpen(false)
+            setIsRightPanelOpen(false)
+          }}
+        />
+      )}
+      
+      {/* Mobile header bar */}
+      <div className="fixed top-0 left-0 right-0 h-14 bg-zinc-950 border-b border-white/[0.05] px-4 flex items-center justify-between z-20 lg:hidden">
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 hover:bg-white/[0.05] rounded-[4px] transition-colors"
+        >
+          <Menu className="h-5 w-5 text-zinc-400" />
+        </button>
+        <div className="flex items-center gap-2">
+          <span className="h-6 w-6 rounded-[4px] bg-white text-black font-black flex items-center justify-center text-xs shadow-sm">L</span>
+          <span className="font-display text-sm font-semibold tracking-tight text-white">Learnly</span>
+        </div>
+        <button 
+          onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
+          className="p-2 hover:bg-white/[0.05] rounded-[4px] transition-colors"
+        >
+          <Sparkles className="h-5 w-5 text-indigo-400" />
+        </button>
+      </div>
+      
       {/* 1. SIDEBAR PANEL */}
-      <aside className="w-[260px] border-r border-white/[0.05] bg-zinc-950 flex flex-col justify-between h-full select-none flex-shrink-0 z-20">
+      <aside className={`fixed lg:relative w-[280px] lg:w-[260px] border-r border-white/[0.05] bg-zinc-950 flex flex-col justify-between h-full select-none flex-shrink-0 z-40 transition-transform duration-300 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
         <div className="p-5 flex flex-col gap-6 overflow-hidden">
           
           {/* Logo Header */}
-          <div className="flex items-center gap-2.5">
-            <span className="h-7 w-7 rounded-[4px] bg-white text-black font-black flex items-center justify-center text-[13px] shadow-sm">L</span>
-            <span className="font-display text-sm font-semibold tracking-tight text-white">Learnly Workspace</span>
+          <div className="flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="h-7 w-7 rounded-[4px] bg-white text-black font-black flex items-center justify-center text-[13px] shadow-sm">L</span>
+              <span className="font-display text-sm font-semibold tracking-tight text-white">Learnly Workspace</span>
+            </div>
+            <button 
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden p-1 hover:bg-white/[0.05] rounded-[4px] transition-colors"
+            >
+              <X className="h-5 w-5 text-zinc-400" />
+            </button>
           </div>
 
           {/* New upload shortcut */}
@@ -465,6 +510,7 @@ export default function DashboardHome() {
             onClick={() => {
               setSelectedUploadId(null)
               setSearchParams({})
+              setIsSidebarOpen(false)
             }}
             className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white hover:bg-zinc-200 text-black text-sm font-semibold rounded-[4px] transition-all shadow-sm"
           >
@@ -486,6 +532,7 @@ export default function DashboardHome() {
                     onClick={() => {
                       setSelectedUploadId(item.id)
                       setSearchParams({ uploadId: item.id })
+                      setIsSidebarOpen(false)
                     }}
                     className={`group w-full px-3 py-2.5 rounded-[4px] flex items-center justify-between text-xs font-medium cursor-pointer transition-all ${
                       selectedUploadId === item.id 
@@ -532,43 +579,43 @@ export default function DashboardHome() {
       </aside>
 
       {/* 2. CENTER PANEL (PDF VIEWER OR UPLOAD ZONE) */}
-      <main className="flex-1 h-full overflow-hidden flex flex-col border-r border-white/[0.05] z-10 relative">
+      <main className="flex-1 h-full overflow-hidden flex flex-col border-r border-white/[0.05] z-10 relative pt-14 lg:pt-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
 
         {selectedUploadId && selectedUpload ? (
           /* WORKSPACE MODE (SELECTED PDF) */
           <div className="flex flex-col h-full overflow-hidden">
             {/* Top Workspace Header */}
-            <div className="h-14 border-b border-white/[0.05] px-6 flex items-center justify-between bg-zinc-950/20">
-              <div className="flex items-center gap-3 overflow-hidden">
+            <div className="h-14 border-b border-white/[0.05] px-4 md:px-6 flex items-center justify-between bg-zinc-950/20">
+              <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
                 <FileText className="h-4 w-4 text-indigo-400 flex-shrink-0" />
-                <h2 className="text-sm font-semibold text-white truncate max-w-[300px] md:max-w-[450px]">
+                <h2 className="text-xs md:text-sm font-semibold text-white truncate">
                   {selectedUpload.file_name}
                 </h2>
               </div>
-              <div className="flex items-center gap-4 text-xs text-zinc-550 font-mono">
+              <div className="hidden sm:flex items-center gap-4 text-xs text-zinc-550 font-mono flex-shrink-0">
                 <span className="px-2 py-0.5 rounded-[2px] bg-zinc-900 border border-white/[0.05] text-zinc-400">PDF Reader</span>
                 <span>{Math.round(selectedUpload.file_size / 1024)} KB</span>
               </div>
             </div>
 
             {/* Document Reader Area */}
-            <div className="flex-1 overflow-y-auto p-10 md:p-14 space-y-8 max-w-3xl mx-auto scrollbar-thin">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 lg:p-14 space-y-6 md:space-y-8 max-w-3xl mx-auto scrollbar-thin w-full">
               
               {/* Cover / Header section */}
               <div className="space-y-5">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[2px] bg-indigo-500/10 border border-indigo-500/20 text-[11px] font-mono text-indigo-350 uppercase tracking-widest font-semibold">
                   <span>Document Workspace</span>
                 </div>
-                <h1 className="font-display text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
+                <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
                   {selectedUpload.file_name}
                 </h1>
                 
                 {/* Content Tabs */}
-                <div className="flex border-b border-white/[0.06] gap-6 pt-3">
+                <div className="flex border-b border-white/[0.06] gap-3 sm:gap-6 pt-3 overflow-x-auto">
                   <button
                     onClick={() => setCenterTab('summary')}
-                    className={`pb-3 text-xs font-mono uppercase tracking-wider font-bold border-b-2 transition-all cursor-pointer ${
+                    className={`pb-3 text-[10px] sm:text-xs font-mono uppercase tracking-wider font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                       centerTab === 'summary'
                         ? 'border-indigo-500 text-white'
                         : 'border-transparent text-zinc-500 hover:text-zinc-350'
@@ -578,13 +625,14 @@ export default function DashboardHome() {
                   </button>
                   <button
                     onClick={() => setCenterTab('source')}
-                    className={`pb-3 text-xs font-mono uppercase tracking-wider font-bold border-b-2 transition-all cursor-pointer ${
+                    className={`pb-3 text-[10px] sm:text-xs font-mono uppercase tracking-wider font-bold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                       centerTab === 'source'
                         ? 'border-indigo-500 text-white'
                         : 'border-transparent text-zinc-500 hover:text-zinc-350'
                     }`}
                   >
-                    Document Text ({Math.round(extractedText.length / 1000)}k chars)
+                    <span className="hidden sm:inline">Document Text ({Math.round(extractedText.length / 1000)}k chars)</span>
+                    <span className="sm:hidden">Text</span>
                   </button>
                 </div>
               </div>
@@ -600,7 +648,7 @@ export default function DashboardHome() {
                   summary ? (
                     <div className="space-y-8 animate-fadeIn">
                       {/* Meta badge block */}
-                      <div className="flex flex-wrap items-center gap-5 text-xs text-zinc-400 font-mono">
+                      <div className="flex flex-wrap items-center gap-3 sm:gap-5 text-[10px] sm:text-xs text-zinc-400 font-mono">
                         <div className="flex items-center gap-1.5">
                           <Activity className="h-3.5 w-3.5 text-zinc-500" />
                           <span>Difficulty:</span>
@@ -621,16 +669,16 @@ export default function DashboardHome() {
 
                       {/* Overview paragraph */}
                       <div className="space-y-3">
-                        <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">Summary Overview</h3>
-                        <p className="text-[15px] leading-relaxed text-zinc-200 font-sans bg-zinc-950/20 p-6 rounded border border-white/[0.04] shadow-sm">
+                        <h3 className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">Summary Overview</h3>
+                        <p className="text-sm sm:text-[15px] leading-relaxed text-zinc-200 font-sans bg-zinc-950/20 p-4 sm:p-6 rounded border border-white/[0.04] shadow-sm">
                           {summary.overview}
                         </p>
                       </div>
 
                       {/* Key takeaway cards */}
                       <div className="space-y-4">
-                        <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">Key Takeaways</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <h3 className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-zinc-500">Key Takeaways</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           {summary.key_points?.map((pt, i) => (
                             <div key={i} className="p-5 bg-zinc-950/40 border border-white/[0.05] rounded-[4px] hover:border-indigo-500/30 hover:bg-zinc-950/60 transition-all text-sm text-zinc-300 flex items-start gap-3 shadow-md">
                               <Sparkles className="h-4.5 w-4.5 text-indigo-400 mt-0.5 flex-shrink-0" />
@@ -678,8 +726,8 @@ export default function DashboardHome() {
               
               {/* Greeting */}
               <div>
-                <h1 className="font-display text-3xl font-bold text-white tracking-tight">Study Workspace</h1>
-                <p className="text-sm text-zinc-500 mt-1 font-sans">Upload a document to generate custom study flashcards, quizzes, and AI summaries.</p>
+                <h1 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">Study Workspace</h1>
+                <p className="text-xs sm:text-sm text-zinc-500 mt-1 font-sans">Upload a document to generate custom study flashcards, quizzes, and AI summaries.</p>
               </div>
 
               {/* Dotted dropzone */}
@@ -688,19 +736,19 @@ export default function DashboardHome() {
                   onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                   onDragLeave={() => setIsDragOver(false)}
                   onDrop={handleFileDrop}
-                  className={`border border-dashed p-12 rounded-[4px] flex flex-col items-center justify-center text-center transition-all ${
+                  className={`border border-dashed p-6 sm:p-8 md:p-12 rounded-[4px] flex flex-col items-center justify-center text-center transition-all ${
                     isDragOver 
                       ? 'border-indigo-500 bg-indigo-500/[0.02]' 
                       : 'border-white/[0.08] bg-zinc-950/40 hover:bg-zinc-950/60'
                   }`}
                 >
-                  <div className="h-12 w-12 bg-zinc-900 border border-white/[0.06] rounded-[4px] flex items-center justify-center mb-4 text-zinc-400">
-                    <Upload className="h-6 w-6" />
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 bg-zinc-900 border border-white/[0.06] rounded-[4px] flex items-center justify-center mb-3 sm:mb-4 text-zinc-400">
+                    <Upload className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
-                  <span className="text-sm font-semibold text-white">Drag & drop your PDF here</span>
-                  <span className="text-xs text-zinc-550 mt-1.5 font-sans">Support PDFs up to 25MB</span>
+                  <span className="text-xs sm:text-sm font-semibold text-white">Drag & drop your PDF here</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-550 mt-1 sm:mt-1.5 font-sans">Support PDFs up to 25MB</span>
                   
-                  <label className="mt-4 px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-[4px] border border-white/[0.06] cursor-pointer transition-colors">
+                  <label className="mt-3 sm:mt-4 px-4 sm:px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-[4px] border border-white/[0.06] cursor-pointer transition-colors">
                     Browse Files
                     <input 
                       type="file" 
@@ -711,12 +759,12 @@ export default function DashboardHome() {
                   </label>
                 </div>
               ) : (
-                <div className="border border-white/[0.08] p-12 rounded-[4px] bg-zinc-950/40 flex flex-col items-center justify-center text-center">
-                  <div className="h-12 w-12 bg-indigo-950/50 border border-indigo-500/20 rounded-[4px] flex items-center justify-center mb-4 text-indigo-400 animate-pulse">
-                    <Sparkles className="h-6 w-6" />
+                <div className="border border-white/[0.08] p-6 sm:p-8 md:p-12 rounded-[4px] bg-zinc-950/40 flex flex-col items-center justify-center text-center">
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 bg-indigo-950/50 border border-indigo-500/20 rounded-[4px] flex items-center justify-center mb-3 sm:mb-4 text-indigo-400 animate-pulse">
+                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
-                  <span className="text-sm font-semibold text-white">Analyzing document structure...</span>
-                  <span className="text-xs text-zinc-550 mt-1.5 font-sans">Learnly AI is generating your summaries, quizzes and flashcards.</span>
+                  <span className="text-xs sm:text-sm font-semibold text-white">Analyzing document structure...</span>
+                  <span className="text-[10px] sm:text-xs text-zinc-550 mt-1 sm:mt-1.5 font-sans">Learnly AI is generating your summaries, quizzes and flashcards.</span>
                   
                   {/* Progress bar */}
                   <div className="w-56 bg-zinc-900 h-1.5 rounded-full overflow-hidden mt-5 border border-white/[0.05]">
@@ -775,36 +823,49 @@ export default function DashboardHome() {
       </main>
 
       {/* 3. RIGHT PANEL (AI STUDY ASSISTANT) */}
-      <aside className="w-[340px] md:w-[400px] h-full flex flex-col bg-zinc-950 flex-shrink-0 z-10 select-none">
+      <aside className={`fixed lg:relative w-full sm:w-[380px] lg:w-[340px] xl:w-[400px] h-full flex flex-col bg-zinc-950 flex-shrink-0 z-40 select-none transition-transform duration-300 ${
+        isRightPanelOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+      }`}>
         
         {/* Assistant Header */}
-        <div className="h-14 border-b border-white/[0.05] px-5 flex items-center gap-2">
-          <Sparkles className="h-4.5 w-4.5 text-indigo-400" />
-          <span className="text-sm font-semibold text-white">Study Assistant</span>
+        <div className="h-14 border-b border-white/[0.05] px-5 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4.5 w-4.5 text-indigo-400" />
+            <span className="text-sm font-semibold text-white">Study Assistant</span>
+          </div>
+          <button 
+            onClick={() => setIsRightPanelOpen(false)}
+            className="lg:hidden p-1 hover:bg-white/[0.05] rounded-[4px] transition-colors"
+          >
+            <X className="h-5 w-5 text-zinc-400" />
+          </button>
         </div>
 
         {selectedUploadId && selectedUpload ? (
           /* ACTIVE STUDY MODE WITH SELECTION */
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Assistant Tabs selector */}
-            <div className="flex border-b border-white/[0.05] bg-zinc-900/10 p-1.5">
+            <div className="flex border-b border-white/[0.05] bg-zinc-900/10 p-1.5 gap-1">
               {['summary', 'flashcards', 'quiz', 'chat'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-2 rounded-[2px] text-[11px] font-mono uppercase tracking-wider font-semibold transition-all ${
+                  className={`flex-1 py-2 px-1 rounded-[2px] text-[10px] sm:text-[11px] font-mono uppercase tracking-wider font-semibold transition-all ${
                     activeTab === tab 
                       ? 'bg-white/[0.05] text-white border border-white/[0.05]' 
                       : 'text-zinc-550 hover:text-zinc-300'
                   }`}
                 >
-                  {tab}
+                  <span className="hidden sm:inline">{tab}</span>
+                  <span className="sm:hidden">
+                    {tab === 'summary' ? 'Sum' : tab === 'flashcards' ? 'Cards' : tab === 'quiz' ? 'Quiz' : 'Chat'}
+                  </span>
                 </button>
               ))}
             </div>
 
             {/* Tab contents */}
-            <div className="flex-1 overflow-y-auto p-5">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-5">
               
               {/* TAB 1: SUMMARY */}
               {activeTab === 'summary' && (
@@ -852,18 +913,18 @@ export default function DashboardHome() {
                       {/* Interactive Flip Card */}
                       <div 
                         onClick={() => setFlashcardFlipped(!flashcardFlipped)}
-                        className="h-[210px] bg-zinc-900/60 border border-white/[0.06] rounded-[4px] p-8 flex flex-col justify-between cursor-pointer select-none hover:border-white/20 transition-all shadow-md group relative overflow-hidden"
+                        className="h-[180px] sm:h-[210px] bg-zinc-900/60 border border-white/[0.06] rounded-[4px] p-6 sm:p-8 flex flex-col justify-between cursor-pointer select-none hover:border-white/20 transition-all shadow-md group relative overflow-hidden"
                       >
                         <div className="absolute inset-0 bg-grid-pattern opacity-[0.03] pointer-events-none" />
                         <span className="text-[9px] font-mono text-zinc-650 uppercase tracking-widest block font-bold">{flashcardFlipped ? 'Answer Key' : 'Question'}</span>
                         
-                        <div className="flex-1 flex items-center justify-center text-center my-3">
-                          <p className="text-sm text-white font-medium leading-relaxed">
+                        <div className="flex-1 flex items-center justify-center text-center my-2 sm:my-3">
+                          <p className="text-xs sm:text-sm text-white font-medium leading-relaxed">
                             {flashcardFlipped ? flashcards[flashcardIndex].answer : flashcards[flashcardIndex].question}
                           </p>
                         </div>
                         
-                        <span className="text-[10px] text-zinc-500 text-center block mt-1 group-hover:text-zinc-350 transition-colors">Click to flip card</span>
+                        <span className="text-[9px] sm:text-[10px] text-zinc-500 text-center block mt-1 group-hover:text-zinc-350 transition-colors">Click to flip card</span>
                       </div>
 
                       {/* Flashcard navigation controls */}
@@ -901,13 +962,13 @@ export default function DashboardHome() {
                     <div className="text-center py-10 text-zinc-550 italic text-xs">No quiz questions available.</div>
                   ) : quizFinished ? (
                     /* Score results view */
-                    <div className="border border-white/[0.06] bg-zinc-950 p-8 rounded-[4px] text-center space-y-4 shadow-sm">
-                      <div className="h-12 w-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
-                        <Activity className="h-6 w-6 animate-pulse" />
+                    <div className="border border-white/[0.06] bg-zinc-950 p-6 sm:p-8 rounded-[4px] text-center space-y-3 sm:space-y-4 shadow-sm">
+                      <div className="h-10 w-10 sm:h-12 sm:w-12 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto">
+                        <Activity className="h-5 w-5 sm:h-6 sm:w-6 animate-pulse" />
                       </div>
-                      <h3 className="font-display text-sm font-bold text-white uppercase tracking-wider">Quiz Finished</h3>
-                      <p className="text-4xl font-mono font-bold text-indigo-400">{Math.round((quizScore / quizzes.length) * 100)}%</p>
-                      <p className="text-xs text-zinc-400">You answered {quizScore} out of {quizzes.length} questions correctly.</p>
+                      <h3 className="font-display text-xs sm:text-sm font-bold text-white uppercase tracking-wider">Quiz Finished</h3>
+                      <p className="text-3xl sm:text-4xl font-mono font-bold text-indigo-400">{Math.round((quizScore / quizzes.length) * 100)}%</p>
+                      <p className="text-[10px] sm:text-xs text-zinc-400">You answered {quizScore} out of {quizzes.length} questions correctly.</p>
                       
                       <button
                         onClick={() => {
@@ -930,12 +991,12 @@ export default function DashboardHome() {
                       </div>
 
                       {/* Question Container */}
-                      <div className="p-5 bg-zinc-900/60 border border-white/[0.06] rounded-[4px]">
-                        <p className="text-sm text-white font-medium leading-snug">{quizzes[quizIndex].question}</p>
+                      <div className="p-4 sm:p-5 bg-zinc-900/60 border border-white/[0.06] rounded-[4px]">
+                        <p className="text-xs sm:text-sm text-white font-medium leading-snug">{quizzes[quizIndex].question}</p>
                       </div>
 
                       {/* Choices Options List */}
-                      <div className="space-y-2.5 text-xs">
+                      <div className="space-y-2 sm:space-y-2.5 text-xs">
                         {quizzes[quizIndex].options?.map((option, idx) => {
                           const isSelected = selectedQuizAnswer === option
                           const isCorrectOption = option === quizzes[quizIndex].correct_answer
@@ -956,7 +1017,7 @@ export default function DashboardHome() {
                               key={idx}
                               onClick={() => handleQuizAnswer(option)}
                               disabled={selectedQuizAnswer !== null}
-                              className={`w-full p-3.5 text-left border rounded-[4px] transition-all flex items-center justify-between text-sm ${buttonStyle}`}
+                              className={`w-full p-3 sm:p-3.5 text-left border rounded-[4px] transition-all flex items-center justify-between text-xs sm:text-sm ${buttonStyle}`}
                             >
                               <span>{option}</span>
                               {selectedQuizAnswer !== null && isCorrectOption && <Check className="h-4 w-4 text-emerald-400" />}
@@ -966,7 +1027,7 @@ export default function DashboardHome() {
                       </div>
 
                       {selectedQuizAnswer !== null && quizzes[quizIndex].explanation && (
-                        <div className="p-4 bg-zinc-950 border border-white/[0.06] rounded-[4px] text-xs text-zinc-500 leading-normal">
+                        <div className="p-3 sm:p-4 bg-zinc-950 border border-white/[0.06] rounded-[4px] text-[10px] sm:text-xs text-zinc-500 leading-normal">
                           <strong className="text-zinc-400 block mb-0.5">Explanation:</strong>
                           {quizzes[quizIndex].explanation}
                         </div>
@@ -978,7 +1039,7 @@ export default function DashboardHome() {
 
               {/* TAB 4: CHAT */}
               {activeTab === 'chat' && (
-                <div className="flex flex-col h-[calc(100vh-230px)]">
+                <div className="flex flex-col h-[calc(100vh-200px)] sm:h-[calc(100vh-230px)]">
                   {/* Messages Feed */}
                   <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">
                     {chatMessages.length === 0 ? (
@@ -995,7 +1056,7 @@ export default function DashboardHome() {
                             {msg.role === 'user' ? 'You' : 'AI Assistant'}
                           </span>
                           <div 
-                            className={`p-3.5 rounded-[4px] text-sm leading-relaxed ${
+                            className={`p-3 sm:p-3.5 rounded-[4px] text-xs sm:text-sm leading-relaxed ${
                               msg.role === 'user'
                                 ? 'bg-indigo-500/15 border border-indigo-500/35 text-indigo-100'
                                 : 'bg-zinc-900 border border-white/[0.06] text-zinc-300'
@@ -1018,20 +1079,20 @@ export default function DashboardHome() {
                       onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
                       placeholder={isSendingChat ? "Thinking..." : "Ask study assistant..."}
                       disabled={isSendingChat}
-                      className="flex-1 bg-transparent outline-none text-sm text-white placeholder-zinc-650 px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-transparent outline-none text-xs sm:text-sm text-white placeholder-zinc-650 px-2 sm:px-3 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <button 
                       onClick={handleSendChat}
                       disabled={isSendingChat || !chatInput.trim()}
-                      className="h-8 px-4 bg-white hover:bg-zinc-200 text-black text-xs font-semibold rounded-[2px] transition-colors disabled:bg-zinc-800/80 disabled:text-zinc-550 disabled:cursor-not-allowed flex items-center gap-1.5"
+                      className="h-8 px-3 sm:px-4 bg-white hover:bg-zinc-200 text-black text-[10px] sm:text-xs font-semibold rounded-[2px] transition-colors disabled:bg-zinc-800/80 disabled:text-zinc-550 disabled:cursor-not-allowed flex items-center gap-1.5"
                     >
                       {isSendingChat ? (
                         <>
                           <span className="h-3 w-3 border-2 border-t-zinc-600 border-zinc-900 rounded-full animate-spin" />
-                          Wait...
+                          <span className="hidden sm:inline">Wait...</span>
                         </>
                       ) : (
-                        'Send'
+                        <span>Send</span>
                       )}
                     </button>
                   </div>
