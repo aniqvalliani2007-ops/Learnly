@@ -564,7 +564,9 @@ export default function DashboardHome() {
               <User className="h-4 w-4" />
             </div>
             <div className="flex flex-col overflow-hidden">
-              <span className="text-xs text-zinc-300 font-medium truncate">{user?.email}</span>
+              <span className="text-xs text-zinc-300 font-medium truncate">
+                {user?.user_metadata?.full_name || user?.email}
+              </span>
               <span className="text-[9px] font-mono text-zinc-550 uppercase tracking-widest font-semibold">Student Account</span>
             </div>
           </div>

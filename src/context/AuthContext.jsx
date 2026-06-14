@@ -29,9 +29,22 @@ export const AuthProvider = ({ children }) => {
     return data
   }
 
-  const signup = async (email, password) => {
-    const { data, error } = await supabase.auth.signUp({ email, password })
+  const signup = async (email, password, firstName, lastName) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          full_name: `${firstName} ${lastName}`.trim(),
+        },
+        emailRedirectTo: undefined,
+      },
+    })
     if (error) throw error
+    // If Supabase returns a session immediately, the user is signed in.
+    // If email confirmation is disabled in the Supabase dashboard, this works directly.
     return data
   }
 
