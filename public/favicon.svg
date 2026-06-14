@@ -1,0 +1,26 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with subtle gradient -->
+  <rect width="64" height="64" rx="12" fill="url(#gradient)"/>
+  
+  <!-- Subtle inner shadow effect -->
+  <rect x="2" y="2" width="60" height="60" rx="10" fill="none" stroke="url(#innerGlow)" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- Letter "L" - Bold and modern -->
+  <path d="M20 16H28V44H44V52H20V16Z" fill="white"/>
+  
+  <!-- Sparkle accent (small dot in top right for AI theme) -->
+  <circle cx="48" cy="16" r="2.5" fill="#6366F1" opacity="0.8"/>
+  <circle cx="48" cy="16" r="1.2" fill="white"/>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#6366F1" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+</svg>
