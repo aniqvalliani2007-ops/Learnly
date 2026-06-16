@@ -358,6 +358,31 @@ export default function DashboardHome() {
         setSearchParams({ uploadId: record.id })
         setSelectedUploadId(record.id)
         await fetchUploads()
+        
+        // Poll for summary data to ensure it's loaded
+        let attempts = 0
+        const maxAttempts = 20 // 20 seconds max
+        const pollInterval = setInterval(async () => {
+          attempts++
+          
+          const { data: summaryCheck } = await supabase
+            .from('summaries')
+            .select('*')
+            .eq('upload_id', record.id)
+            .maybeSingle()
+          
+          if (summaryCheck || attempts >= maxAttempts) {
+            clearInterval(pollInterval)
+            // Force reload by triggering the useEffect
+            setSelectedUploadId(null)
+            setTimeout(() => setSelectedUploadId(record.id), 100)
+          }
+        }, 1000)
+      }
+    } catch (err) {
+      console.error('Upload failed:', err)
+    }
+  }
       }
     } catch (err) {
       console.error('Upload failed:', err)
@@ -711,8 +736,8 @@ export default function DashboardHome() {
                     </div>
                   )
                 ) : extractedText ? (
-                  <div className="text-[14px] leading-relaxed text-zinc-300 font-sans select-text whitespace-pre-wrap bg-zinc-950/30 p-7 rounded border border-white/[0.04] shadow-sm max-w-none">
-                    {extractedText}
+                  <div className="font-mono text-[13px] sm:text-[14px] leading-relaxed text-zinc-300 select-text bg-zinc-950/30 p-6 sm:p-7 rounded border border-white/[0.04] shadow-sm max-w-none overflow-x-auto">
+                    <pre className="whitespace-pre-wrap break-words font-mono">{extractedText}</pre>
                   </div>
                 ) : (
                   <p className="text-sm text-zinc-550 italic font-mono">No readable source text extracted from this document.</p>

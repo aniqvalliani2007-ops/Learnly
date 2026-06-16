@@ -14,17 +14,40 @@ export const openrouterService = {
     let text = ''
     // Limit to first 10 pages for processing efficiency and token limits
     const pagesToRead = Math.min(pdf.numPages, 10)
+    
     for (let i = 1; i <= pagesToRead; i++) {
       try {
         const page = await pdf.getPage(i)
         const content = await page.getTextContent()
-        const pageText = content.items.map(item => item.str).join(' ')
-        text += `\n--- PAGE ${i} ---\n` + pageText
+        
+        // Build text with better formatting
+        let pageText = ''
+        let lastY = null
+        
+        content.items.forEach((item, index) => {
+          const currentY = item.transform[5]
+          
+          // Add line break if Y position changed significantly (new line)
+          if (lastY !== null && Math.abs(currentY - lastY) > 5) {
+            pageText += '\n'
+          }
+          
+          // Add space between words on same line
+          if (lastY === currentY && index > 0 && item.str.trim()) {
+            pageText += ' '
+          }
+          
+          pageText += item.str
+          lastY = currentY
+        })
+        
+        text += `\n\n═══ PAGE ${i} ═══\n\n${pageText.trim()}\n`
       } catch (pageErr) {
         console.error(`Error parsing page ${i}:`, pageErr)
       }
     }
-    return text || 'No readable text content found in PDF.'
+    
+    return text.trim() || 'No readable text content found in PDF.'
   },
 
   // Analyze the extracted text using OpenRouter with model fallbacks
@@ -36,9 +59,9 @@ export const openrouterService = {
 
     const systemPrompt = `You are an AI study assistant. Analyze the text content of the uploaded document: "${fileName}".
 Extract the core topics, and return a single JSON object containing:
-1. "summary": { "overview": "A detailed paragraph summary summarizing main thesis/topics of this text", "key_points": ["Core point 1", "Core point 2", "Core point 3", "Core point 4"], "estimated_read_time": 6, "difficulty": "intermediate", "topics": ["Topic A", "Topic B"] }
-2. "flashcards": [ { "question": "Clear study question related to this text", "answer": "Clear study answer related to this text", "topic": "General", "difficulty": "medium" } ] (Return 4 to 6 flashcards)
-3. "quizzes": [ { "question": "Multiple choice question related to this text", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": "Option B", "explanation": "Detailed explanation of correct answer", "topic": "General", "difficulty": "medium" } ] (Return 3 to 5 quiz questions. Options MUST include the correct_answer string EXACTLY)
+1. "summary": { "overview": "A detailed paragraph summary summarizing main thesis/topics of this text", "key_points": ["Core point 1", "Core point 2", "Core point 3", "Core point 4", "Core point 5"], "estimated_read_time": 8, "difficulty": "intermediate", "topics": ["Topic A", "Topic B", "Topic C"] }
+2. "flashcards": [ { "question": "Clear study question related to this text", "answer": "Clear study answer related to this text", "topic": "General", "difficulty": "medium" } ] (Return 6 to 8 flashcards covering different topics)
+3. "quizzes": [ { "question": "Multiple choice question related to this text", "options": ["Option A", "Option B", "Option C", "Option D"], "correct_answer": "Option B", "explanation": "Detailed explanation of correct answer", "topic": "General", "difficulty": "medium" } ] (Return exactly 10 quiz questions with varying difficulty levels. Options MUST include the correct_answer string EXACTLY)
 
 Ensure the response is strictly valid JSON with no markdown syntax wrapping (no \`\`\`json blocks), just the raw JSON object.`
 
@@ -65,7 +88,7 @@ Ensure the response is strictly valid JSON with no markdown syntax wrapping (no 
               { role: 'system', content: systemPrompt },
               { role: 'user', content: userPrompt }
             ],
-            max_tokens: 1500
+            max_tokens: 2500
           },
           {
             headers: {

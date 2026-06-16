@@ -106,11 +106,13 @@ export const useUpload = () => {
           key_points: [
             "Analyzes core structural components and methodologies present in the document.",
             "Synthesizes central concepts to prepare for flashcards and quiz review.",
-            "Outlines the logical dependencies of materials across all chapters."
+            "Outlines the logical dependencies of materials across all chapters.",
+            "Provides comprehensive coverage of essential learning objectives.",
+            "Structures information for optimal retention and understanding."
           ],
-          topics: ["Overview", "Section 1", "Section 2"],
+          topics: ["Overview", "Section 1", "Section 2", "Key Concepts"],
           difficulty: "intermediate",
-          estimated_read_time: 5,
+          estimated_read_time: 8,
           raw_text: "Mock text context for study guide."
         })
 
@@ -128,28 +130,117 @@ export const useUpload = () => {
           user_id: userId,
           question: "How should you utilize these flashcards for active recall?",
           answer: "Read the question, attempt to define the concept, and click the card to reveal the answer.",
-          topic: "Overview",
+          topic: "Study Methods",
           difficulty: "easy"
-        }
-      ])
-
-      await supabase.from('quizzes').insert([
+        },
         {
           upload_id: uploadId,
           user_id: userId,
-          question: "Which studying technique is recommended to consolidate long-term memory?",
-          options: [
-            "A. Passive highlighting",
-            "B. Re-reading pages",
-            "C. Active recall and spaced repetition",
-            "D. Memorization by rote"
-          ],
-          correct_answer: "C. Active recall and spaced repetition",
-          explanation: "Active recall forces the brain to retrieve information, building stronger neural pathways.",
-          topic: "General",
+          question: "What is spaced repetition?",
+          answer: "A learning technique that involves reviewing material at increasing intervals to improve long-term retention.",
+          topic: "Learning Strategies",
+          difficulty: "medium"
+        },
+        {
+          upload_id: uploadId,
+          user_id: userId,
+          question: "Why is active recall more effective than passive reading?",
+          answer: "Active recall forces the brain to retrieve information, strengthening neural pathways and improving memory consolidation.",
+          topic: "Cognitive Science",
           difficulty: "medium"
         }
       ])
+
+      const quizQuestions = [
+        {
+          question: "Which studying technique is recommended to consolidate long-term memory?",
+          options: ["A. Passive highlighting", "B. Re-reading pages", "C. Active recall and spaced repetition", "D. Memorization by rote"],
+          correct_answer: "C. Active recall and spaced repetition",
+          explanation: "Active recall forces the brain to retrieve information, building stronger neural pathways.",
+          topic: "Study Techniques",
+          difficulty: "medium"
+        },
+        {
+          question: "What is the main benefit of using flashcards for studying?",
+          options: ["A. They look organized", "B. They promote active recall", "C. They are easy to make", "D. They save paper"],
+          correct_answer: "B. They promote active recall",
+          explanation: "Flashcards force you to actively retrieve information, which strengthens memory.",
+          topic: "Learning Tools",
+          difficulty: "easy"
+        },
+        {
+          question: "How often should you review material using spaced repetition?",
+          options: ["A. Every day at the same time", "B. Only before exams", "C. At increasing intervals over time", "D. Once a week"],
+          correct_answer: "C. At increasing intervals over time",
+          explanation: "Spaced repetition works by reviewing material at progressively longer intervals to optimize retention.",
+          topic: "Study Scheduling",
+          difficulty: "medium"
+        },
+        {
+          question: "What percentage of information do students typically retain when using active learning methods?",
+          options: ["A. 10-20%", "B. 30-40%", "C. 50-70%", "D. 80-90%"],
+          correct_answer: "C. 50-70%",
+          explanation: "Research shows active learning methods like practice testing can improve retention to 50-70%.",
+          topic: "Learning Science",
+          difficulty: "hard"
+        },
+        {
+          question: "Which part of the brain is primarily responsible for forming new memories?",
+          options: ["A. Cerebellum", "B. Hippocampus", "C. Amygdala", "D. Frontal lobe"],
+          correct_answer: "B. Hippocampus",
+          explanation: "The hippocampus plays a crucial role in forming and retrieving declarative memories.",
+          topic: "Neuroscience",
+          difficulty: "hard"
+        },
+        {
+          question: "What is the 'forgetting curve' concept?",
+          options: ["A. A graph showing memory decay over time", "B. A study schedule", "C. A type of learning disability", "D. A testing method"],
+          correct_answer: "A. A graph showing memory decay over time",
+          explanation: "The forgetting curve, discovered by Ebbinghaus, shows how information is lost over time without reinforcement.",
+          topic: "Memory Theory",
+          difficulty: "medium"
+        },
+        {
+          question: "What does 'metacognition' refer to in learning?",
+          options: ["A. Learning about cognition", "B. Thinking about your own thinking", "C. Group studying", "D. Memory techniques"],
+          correct_answer: "B. Thinking about your own thinking",
+          explanation: "Metacognition involves awareness and understanding of one's own thought processes and learning strategies.",
+          topic: "Learning Psychology",
+          difficulty: "medium"
+        },
+        {
+          question: "Which study environment is generally most effective?",
+          options: ["A. Quiet and distraction-free", "B. With background music", "C. In groups only", "D. While multitasking"],
+          correct_answer: "A. Quiet and distraction-free",
+          explanation: "Research consistently shows that quiet, focused environments lead to better comprehension and retention.",
+          topic: "Study Environment",
+          difficulty: "easy"
+        },
+        {
+          question: "How long should an optimal study session last?",
+          options: ["A. 10-15 minutes", "B. 25-50 minutes", "C. 2-3 hours", "D. As long as possible"],
+          correct_answer: "B. 25-50 minutes",
+          explanation: "Studies show focused sessions of 25-50 minutes followed by breaks are most effective for learning.",
+          topic: "Time Management",
+          difficulty: "medium"
+        },
+        {
+          question: "What is the Pomodoro Technique?",
+          options: ["A. A cooking method", "B. A time management method using 25-minute intervals", "C. A memory palace technique", "D. A note-taking system"],
+          correct_answer: "B. A time management method using 25-minute intervals",
+          explanation: "The Pomodoro Technique uses 25-minute focused work intervals followed by short breaks to maintain productivity.",
+          topic: "Productivity",
+          difficulty: "easy"
+        }
+      ]
+
+      await supabase.from('quizzes').insert(
+        quizQuestions.map(q => ({
+          upload_id: uploadId,
+          user_id: userId,
+          ...q
+        }))
+      )
     } catch (e) {
       console.error('Failed to insert fallback content:', e)
     }
