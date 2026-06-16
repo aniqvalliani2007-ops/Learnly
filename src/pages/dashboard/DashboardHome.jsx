@@ -383,11 +383,6 @@ export default function DashboardHome() {
       console.error('Upload failed:', err)
     }
   }
-      }
-    } catch (err) {
-      console.error('Upload failed:', err)
-    }
-  }
 
   // Delete document handler
   const handleDeleteUpload = async (id, e) => {
