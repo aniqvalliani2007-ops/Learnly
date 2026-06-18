@@ -143,35 +143,21 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      console.log('🔍 Fetching admin data...')
-
-      // Strategy: Query uploads table which contains user_id, then get unique users
-      const { data: uploads = [], error: uploadsError } = await supabase
+      // Fetch all uploads
+      const { data: uploads = [] } = await supabase
         .from('uploads')
         .select('id, user_id, file_name, file_size, created_at, status')
         .order('created_at', { ascending: false })
 
-      if (uploadsError) {
-        console.error('❌ Uploads fetch error:', uploadsError)
-      }
-
-      console.log(`📦 Found ${uploads.length} uploads`)
-
-      // Get upload counts
-      const { data: counts = [], error: countsError } = await supabase
+      // Get upload counts (this table has email/name from when users upload)
+      const { data: counts = [] } = await supabase
         .from('user_upload_counts')
         .select('*')
-
-      if (countsError) {
-        console.error('❌ Counts fetch error:', countsError)
-      }
-
-      console.log(`📊 Found ${counts.length} user count records`)
 
       // Build user map
       const userMap = {}
 
-      // First pass: Add users from counts (these have email/name from uploads)
+      // Add users from counts table (has email/name)
       counts.forEach(c => {
         userMap[c.user_id] = {
           user_id: c.user_id,
@@ -184,23 +170,15 @@ export default function AdminDashboard() {
         }
       })
 
-      // Second pass: Add users from uploads who aren't in counts yet
+      // Add users from uploads who aren't in counts yet
       const uniqueUserIds = [...new Set(uploads.map(u => u.user_id))]
-      console.log(`👥 Found ${uniqueUserIds.length} unique user IDs from uploads`)
 
-      for (const userId of uniqueUserIds) {
+      uniqueUserIds.forEach(userId => {
         if (!userMap[userId]) {
-          // Fetch this user's profile from auth (public profile data)
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .maybeSingle()
-
           userMap[userId] = {
             user_id: userId,
-            email: profile?.email || 'Unknown',
-            full_name: profile?.full_name || null,
+            email: 'User (no upload count)',
+            full_name: null,
             lifetime_uploads: 0,
             last_sign_in: null,
             created_at: uploads.find(u => u.user_id === userId)?.created_at,
@@ -209,7 +187,7 @@ export default function AdminDashboard() {
         }
       })
 
-      // Third pass: Attach uploads to users
+      // Attach uploads to users
       uploads.forEach(up => {
         if (userMap[up.user_id]) {
           userMap[up.user_id].uploads.push(up)
@@ -220,12 +198,9 @@ export default function AdminDashboard() {
         new Date(b.created_at || 0) - new Date(a.created_at || 0)
       )
 
-      console.log(`✅ Processed ${userList.length} total users`)
-      console.log('Users:', userList.map(u => ({ email: u.email, uploads: u.uploads.length })))
-
       setUsers(userList)
     } catch (err) {
-      console.error('❌ Admin fetch error:', err)
+      console.error('Admin fetch error:', err)
     } finally {
       setLoading(false)
     }
