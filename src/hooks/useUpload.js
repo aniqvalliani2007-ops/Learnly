@@ -13,6 +13,18 @@ export const useUpload = () => {
     setProgress(10)
 
     try {
+      // Check upload count — enforce 3 upload free limit
+      const { count, error: countError } = await supabase
+        .from('uploads')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+
+      if (countError) throw countError
+
+      if (count >= 3) {
+        throw new Error('UPLOAD_LIMIT_REACHED')
+      }
+
       // 1. Upload to Supabase Storage
       const storagePath = `${userId}/${Date.now()}-${file.name}`
       const { data: uploadData, error: uploadError } = await supabase.storage

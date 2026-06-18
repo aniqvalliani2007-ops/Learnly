@@ -8,6 +8,7 @@ import HomePage from '../pages/landing/HomePage'
 import LoginPage from '../pages/auth/LoginPage'
 import SignupPage from '../pages/auth/SignupPage'
 import DashboardHome from '../pages/dashboard/DashboardHome'
+import UpgradePage from '../pages/dashboard/UpgradePage'
 
 const AppRoutes = () => {
   return (
@@ -55,6 +56,16 @@ const AppRoutes = () => {
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
+
+          {/* Upgrade page */}
+          <Route
+            path="/upgrade"
+            element={
+              <ProtectedRoute>
+                <UpgradePage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </UploadProvider>
     </AuthProvider>

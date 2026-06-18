@@ -23,7 +23,9 @@ import {
   ExternalLink,
   ChevronRight,
   Menu,
-  X
+  X,
+  Zap,
+  Lock
 } from 'lucide-react'
 
 // Beautiful, native React Markdown-to-HTML renderer for assistant responses
@@ -380,6 +382,10 @@ export default function DashboardHome() {
         }, 1000)
       }
     } catch (err) {
+      if (err.message === 'UPLOAD_LIMIT_REACHED') {
+        navigate('/upgrade')
+        return
+      }
       console.error('Upload failed:', err)
     }
   }
@@ -526,17 +532,48 @@ export default function DashboardHome() {
           </div>
 
           {/* New upload shortcut */}
-          <button 
-            onClick={() => {
-              setSelectedUploadId(null)
-              setSearchParams({})
-              setIsSidebarOpen(false)
-            }}
-            className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white hover:bg-zinc-200 text-black text-sm font-semibold rounded-[4px] transition-all shadow-sm"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Upload PDF</span>
-          </button>
+          {uploads.length >= 3 ? (
+            <button
+              onClick={() => navigate('/upgrade')}
+              className="flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-[4px] transition-all shadow-sm"
+            >
+              <Zap className="h-4 w-4" />
+              <span>Upgrade to Upload</span>
+            </button>
+          ) : (
+            <button 
+              onClick={() => {
+                setSelectedUploadId(null)
+                setSearchParams({})
+                setIsSidebarOpen(false)
+              }}
+              className="flex items-center justify-center gap-2 py-2.5 px-4 bg-white hover:bg-zinc-200 text-black text-sm font-semibold rounded-[4px] transition-all shadow-sm"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Upload PDF</span>
+            </button>
+          )}
+
+          {/* Upload usage meter */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+              <span className="uppercase tracking-widest">Free Usage</span>
+              <span className={uploads.length >= 3 ? 'text-rose-400 font-bold' : 'text-zinc-400'}>
+                {uploads.length} / 3 uploads
+              </span>
+            </div>
+            <div className="w-full h-1 rounded-full bg-zinc-800 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  uploads.length >= 3 ? 'bg-rose-500' : uploads.length === 2 ? 'bg-amber-500' : 'bg-indigo-500'
+                }`}
+                style={{ width: `${Math.min((uploads.length / 3) * 100, 100)}%` }}
+              />
+            </div>
+            {uploads.length >= 3 && (
+              <p className="text-[10px] text-rose-400 font-mono">Limit reached — upgrade to continue</p>
+            )}
+          </div>
 
           {/* Uploads list container */}
           <div className="flex flex-col gap-3 overflow-hidden">
@@ -576,6 +613,36 @@ export default function DashboardHome() {
             </div>
           </div>
         </div>
+
+        {/* Upgrade CTA — only show when at or near limit */}
+        {uploads.length >= 2 && (
+          <div className="px-5 pb-3">
+            <div className={`p-3.5 rounded-[4px] border space-y-2.5 ${
+              uploads.length >= 3
+                ? 'bg-indigo-500/10 border-indigo-500/25'
+                : 'bg-amber-500/5 border-amber-500/20'
+            }`}>
+              <div className="flex items-center gap-2">
+                <Zap className={`h-3.5 w-3.5 flex-shrink-0 ${uploads.length >= 3 ? 'text-indigo-400' : 'text-amber-400'}`} />
+                <span className="text-[11px] font-bold text-white">
+                  {uploads.length >= 3 ? 'Free limit reached' : '1 upload remaining'}
+                </span>
+              </div>
+              <p className="text-[10px] text-zinc-400 leading-relaxed font-sans">
+                {uploads.length >= 3
+                  ? 'Upgrade to Pro for unlimited uploads and advanced AI features.'
+                  : 'Upgrade before you run out to keep your study flow going.'}
+              </p>
+              <button
+                onClick={() => navigate('/upgrade')}
+                className="w-full py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-[3px] transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Zap className="h-3 w-3" />
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Profile / Logout at bottom */}
         <div className="p-5 border-t border-white/[0.05] flex flex-col gap-4">
@@ -754,32 +821,51 @@ export default function DashboardHome() {
 
               {/* Dotted dropzone */}
               {!isUploading ? (
-                <div 
-                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
-                  onDragLeave={() => setIsDragOver(false)}
-                  onDrop={handleFileDrop}
-                  className={`border border-dashed p-6 sm:p-8 md:p-12 rounded-[4px] flex flex-col items-center justify-center text-center transition-all ${
-                    isDragOver 
-                      ? 'border-indigo-500 bg-indigo-500/[0.02]' 
-                      : 'border-white/[0.08] bg-zinc-950/40 hover:bg-zinc-950/60'
-                  }`}
-                >
-                  <div className="h-10 w-10 sm:h-12 sm:w-12 bg-zinc-900 border border-white/[0.06] rounded-[4px] flex items-center justify-center mb-3 sm:mb-4 text-zinc-400">
-                    <Upload className="h-5 w-5 sm:h-6 sm:w-6" />
+                uploads.length >= 3 ? (
+                  /* LIMIT REACHED — show upgrade prompt instead of dropzone */
+                  <div className="border border-dashed border-rose-500/30 p-8 sm:p-12 rounded-[4px] bg-rose-500/[0.02] flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="h-12 w-12 bg-indigo-500/10 border border-indigo-500/20 rounded-[4px] flex items-center justify-center text-indigo-400">
+                      <Lock className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">Free upload limit reached</p>
+                      <p className="text-xs text-zinc-500 mt-1 font-sans">You've used all 3 free uploads. Upgrade to Pro for unlimited access.</p>
+                    </div>
+                    <button
+                      onClick={() => navigate('/upgrade')}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-[4px] transition-all shadow-lg shadow-indigo-500/20"
+                    >
+                      <Zap className="h-3.5 w-3.5" />
+                      Upgrade to Pro
+                    </button>
                   </div>
-                  <span className="text-xs sm:text-sm font-semibold text-white">Drag & drop your PDF here</span>
-                  <span className="text-[10px] sm:text-xs text-zinc-550 mt-1 sm:mt-1.5 font-sans">Support PDFs up to 25MB</span>
-                  
-                  <label className="mt-3 sm:mt-4 px-4 sm:px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-[4px] border border-white/[0.06] cursor-pointer transition-colors">
-                    Browse Files
-                    <input 
-                      type="file" 
-                      accept="application/pdf" 
-                      onChange={handleFileSelect} 
-                      className="hidden" 
-                    />
-                  </label>
-                </div>
+                ) : (
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={handleFileDrop}
+                    className={`border border-dashed p-6 sm:p-8 md:p-12 rounded-[4px] flex flex-col items-center justify-center text-center transition-all ${
+                      isDragOver 
+                        ? 'border-indigo-500 bg-indigo-500/[0.02]' 
+                        : 'border-white/[0.08] bg-zinc-950/40 hover:bg-zinc-950/60'
+                    }`}
+                  >
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 bg-zinc-900 border border-white/[0.06] rounded-[4px] flex items-center justify-center mb-3 sm:mb-4 text-zinc-400">
+                      <Upload className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <span className="text-xs sm:text-sm font-semibold text-white">Drag & drop your PDF here</span>
+                    <span className="text-[10px] sm:text-xs text-zinc-550 mt-1 sm:mt-1.5 font-sans">Support PDFs up to 25MB</span>
+                    <label className="mt-3 sm:mt-4 px-4 sm:px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold rounded-[4px] border border-white/[0.06] cursor-pointer transition-colors">
+                      Browse Files
+                      <input 
+                        type="file" 
+                        accept="application/pdf" 
+                        onChange={handleFileSelect} 
+                        className="hidden" 
+                      />
+                    </label>
+                  </div>
+                )
               ) : (
                 <div className="border border-white/[0.08] p-6 sm:p-8 md:p-12 rounded-[4px] bg-zinc-950/40 flex flex-col items-center justify-center text-center">
                   <div className="h-10 w-10 sm:h-12 sm:w-12 bg-indigo-950/50 border border-indigo-500/20 rounded-[4px] flex items-center justify-center mb-3 sm:mb-4 text-indigo-400 animate-pulse">
