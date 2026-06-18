@@ -143,51 +143,53 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // Fetch all upload count records
+      // 1. Fetch all upload count records (contains user emails and names we sync on upload)
       const { data: counts = [] } = await supabase
         .from('user_upload_counts')
         .select('*')
 
-      // Fetch all uploads grouped by user
+      // 2. Fetch all uploads grouped by user
       const { data: uploads = [] } = await supabase
         .from('uploads')
         .select('id, user_id, file_name, file_size, created_at, status')
         .order('created_at', { ascending: false })
 
-      // Build user list from upload counts + supplement with upload details
+      // 3. Build user map starting from upload counts (has email/name)
       const userMap = {}
 
       counts.forEach(c => {
         userMap[c.user_id] = {
           user_id: c.user_id,
-          email: c.email || null,
+          email: c.email || 'No email',
           full_name: c.full_name || null,
           lifetime_uploads: c.total_uploads || 0,
-          last_sign_in: c.updated_at || null,
+          last_sign_in: c.updated_at || c.created_at || null,
           created_at: c.created_at || null,
           uploads: [],
         }
       })
 
-      // Also include users who have uploads but no count record (legacy)
+      // 4. Attach uploads to each user and handle users who uploaded before we added metadata tracking
       uploads.forEach(up => {
         if (!userMap[up.user_id]) {
           userMap[up.user_id] = {
             user_id: up.user_id,
-            email: null,
+            email: 'Legacy user (no email)',
             full_name: null,
             lifetime_uploads: 0,
-            last_sign_in: null,
-            created_at: null,
+            last_sign_in: up.created_at,
+            created_at: up.created_at,
             uploads: [],
           }
         }
         userMap[up.user_id].uploads.push(up)
       })
 
-      setUsers(Object.values(userMap).sort((a, b) =>
-        new Date(b.created_at || 0) - new Date(a.created_at || 0)
-      ))
+      const userList = Object.values(userMap).sort((a, b) =>
+        new Date(b.last_sign_in || b.created_at || 0) - new Date(a.last_sign_in || a.created_at || 0)
+      )
+
+      setUsers(userList)
     } catch (err) {
       console.error('Admin fetch error:', err)
     } finally {

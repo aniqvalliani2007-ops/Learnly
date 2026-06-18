@@ -64,8 +64,13 @@ export const useUpload = () => {
       if (dbError) throw dbError
       setProgress(60)
 
-      // Increment lifetime upload counter (never decrements on delete)
-      await supabase.rpc('increment_upload_count', { p_user_id: userId })
+      // Increment lifetime upload counter and sync user metadata
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      await supabase.rpc('increment_upload_count_with_metadata', {
+        p_user_id: userId,
+        p_email: currentUser?.email || null,
+        p_full_name: currentUser?.user_metadata?.full_name || null
+      })
 
       try {
         // 4. Download PDF Blob to extract text
