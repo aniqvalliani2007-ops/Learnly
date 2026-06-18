@@ -143,46 +143,82 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true)
     try {
-      // 1. Fetch all upload count records (contains user emails and names we sync on upload)
+      // Use RPC to fetch all users from auth.users (we'll create this function)
+      const { data: allUsers = [], error: usersError } = await supabase.rpc('get_all_users_admin')
+      
+      if (usersError) {
+        console.error('Error fetching users:', usersError)
+        // Fallback to empty array if function doesn't exist yet
+      }
+
+      // Fetch all upload count records
       const { data: counts = [] } = await supabase
         .from('user_upload_counts')
         .select('*')
 
-      // 2. Fetch all uploads grouped by user
+      // Fetch all uploads grouped by user
       const { data: uploads = [] } = await supabase
         .from('uploads')
         .select('id, user_id, file_name, file_size, created_at, status')
         .order('created_at', { ascending: false })
 
-      // 3. Build user map starting from upload counts (has email/name)
+      // Build user map starting from ALL authenticated users
       const userMap = {}
 
-      counts.forEach(c => {
-        userMap[c.user_id] = {
-          user_id: c.user_id,
-          email: c.email || 'No email',
-          full_name: c.full_name || null,
-          lifetime_uploads: c.total_uploads || 0,
-          last_sign_in: c.updated_at || c.created_at || null,
-          created_at: c.created_at || null,
+      // First, add all users from auth (even if they haven't uploaded)
+      allUsers.forEach(u => {
+        userMap[u.id] = {
+          user_id: u.id,
+          email: u.email || 'No email',
+          full_name: u.raw_user_meta_data?.full_name || u.raw_user_meta_data?.name || null,
+          lifetime_uploads: 0,
+          last_sign_in: u.last_sign_in_at || u.updated_at || null,
+          created_at: u.created_at || null,
           uploads: [],
         }
       })
 
-      // 4. Attach uploads to each user and handle users who uploaded before we added metadata tracking
+      // Merge upload counts
+      counts.forEach(c => {
+        if (userMap[c.user_id]) {
+          userMap[c.user_id].lifetime_uploads = c.total_uploads || 0
+          // Update email/name from count table if auth doesn't have it
+          if (!userMap[c.user_id].email || userMap[c.user_id].email === 'No email') {
+            userMap[c.user_id].email = c.email || 'No email'
+          }
+          if (!userMap[c.user_id].full_name) {
+            userMap[c.user_id].full_name = c.full_name
+          }
+        } else {
+          // User in counts but not in auth (shouldn't happen, but handle it)
+          userMap[c.user_id] = {
+            user_id: c.user_id,
+            email: c.email || 'No email',
+            full_name: c.full_name || null,
+            lifetime_uploads: c.total_uploads || 0,
+            last_sign_in: c.updated_at || c.created_at || null,
+            created_at: c.created_at || null,
+            uploads: [],
+          }
+        }
+      })
+
+      // Attach uploads to each user
       uploads.forEach(up => {
-        if (!userMap[up.user_id]) {
+        if (userMap[up.user_id]) {
+          userMap[up.user_id].uploads.push(up)
+        } else {
+          // Legacy upload with no user record
           userMap[up.user_id] = {
             user_id: up.user_id,
-            email: 'Legacy user (no email)',
+            email: 'Legacy user',
             full_name: null,
             lifetime_uploads: 0,
             last_sign_in: up.created_at,
             created_at: up.created_at,
-            uploads: [],
+            uploads: [up],
           }
         }
-        userMap[up.user_id].uploads.push(up)
       })
 
       const userList = Object.values(userMap).sort((a, b) =>
