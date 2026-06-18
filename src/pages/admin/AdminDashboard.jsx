@@ -143,64 +143,98 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true)
     try {
+      // Try to fetch from RPC function first (needs to be created in Supabase)
+      let allAuthUsers = []
+      
+      // Attempt to call admin RPC to get all users
+      const { data: rpcUsers, error: rpcError } = await supabase.rpc('admin_get_all_users')
+      
+      if (!rpcError && rpcUsers) {
+        allAuthUsers = rpcUsers
+        console.log(`✅ Fetched ${allAuthUsers.length} users from auth via RPC`)
+      } else {
+        console.warn('⚠️ RPC function not available, falling back to upload-based users')
+      }
+
+      // Fetch upload counts
+      const { data: counts = [] } = await supabase
+        .from('user_upload_counts')
+        .select('*')
+
       // Fetch all uploads
       const { data: uploads = [] } = await supabase
         .from('uploads')
         .select('id, user_id, file_name, file_size, created_at, status')
         .order('created_at', { ascending: false })
 
-      // Get upload counts (this table has email/name from when users upload)
-      const { data: counts = [] } = await supabase
-        .from('user_upload_counts')
-        .select('*')
-
-      // Build user map
+      // Build comprehensive user map
       const userMap = {}
 
-      // Add users from counts table (has email/name)
-      counts.forEach(c => {
-        userMap[c.user_id] = {
-          user_id: c.user_id,
-          email: c.email || 'No email',
-          full_name: c.full_name || null,
-          lifetime_uploads: c.total_uploads || 0,
-          last_sign_in: c.updated_at || c.created_at,
-          created_at: c.created_at,
+      // Priority 1: Add ALL users from auth (if RPC worked)
+      allAuthUsers.forEach(authUser => {
+        userMap[authUser.user_id] = {
+          user_id: authUser.user_id,
+          email: authUser.email || 'No email',
+          full_name: authUser.full_name || null,
+          lifetime_uploads: 0,
+          last_sign_in: authUser.last_sign_in_at || authUser.created_at,
+          created_at: authUser.created_at,
           uploads: [],
         }
       })
 
-      // Add users from uploads who aren't in counts yet
-      const uniqueUserIds = [...new Set(uploads.map(u => u.user_id))]
-
-      uniqueUserIds.forEach(userId => {
-        if (!userMap[userId]) {
-          userMap[userId] = {
-            user_id: userId,
-            email: 'User (no upload count)',
-            full_name: null,
-            lifetime_uploads: 0,
-            last_sign_in: null,
-            created_at: uploads.find(u => u.user_id === userId)?.created_at,
+      // Priority 2: Merge upload counts (contains email/name for users who uploaded)
+      counts.forEach(c => {
+        if (userMap[c.user_id]) {
+          // Update existing entry with upload count
+          userMap[c.user_id].lifetime_uploads = c.total_uploads || 0
+          if (!userMap[c.user_id].email || userMap[c.user_id].email === 'No email') {
+            userMap[c.user_id].email = c.email || userMap[c.user_id].email
+          }
+          if (!userMap[c.user_id].full_name) {
+            userMap[c.user_id].full_name = c.full_name
+          }
+        } else {
+          // User not in auth list (shouldn't happen, but add them)
+          userMap[c.user_id] = {
+            user_id: c.user_id,
+            email: c.email || 'No email',
+            full_name: c.full_name || null,
+            lifetime_uploads: c.total_uploads || 0,
+            last_sign_in: c.updated_at,
+            created_at: c.created_at,
             uploads: [],
           }
         }
       })
 
-      // Attach uploads to users
+      // Priority 3: Attach actual upload files to users
       uploads.forEach(up => {
         if (userMap[up.user_id]) {
           userMap[up.user_id].uploads.push(up)
+        } else {
+          // Orphaned upload (user deleted from auth but upload exists)
+          userMap[up.user_id] = {
+            user_id: up.user_id,
+            email: 'Deleted user',
+            full_name: null,
+            lifetime_uploads: 0,
+            last_sign_in: up.created_at,
+            created_at: up.created_at,
+            uploads: [up],
+          }
         }
       })
 
+      // Sort by most recent activity
       const userList = Object.values(userMap).sort((a, b) =>
-        new Date(b.created_at || 0) - new Date(a.created_at || 0)
+        new Date(b.last_sign_in || b.created_at || 0) - new Date(a.last_sign_in || a.created_at || 0)
       )
 
+      console.log(`📊 Total users in dashboard: ${userList.length}`)
       setUsers(userList)
     } catch (err) {
-      console.error('Admin fetch error:', err)
+      console.error('❌ Admin fetch error:', err)
     } finally {
       setLoading(false)
     }
