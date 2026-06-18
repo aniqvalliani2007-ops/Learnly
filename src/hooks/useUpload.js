@@ -7,21 +7,27 @@ export const useUpload = () => {
   const [error, setError] = useState(null)
   const [progress, setProgress] = useState(0)
 
+  // Returns the lifetime upload count for a user (never decreases on delete)
+  const getLifetimeUploadCount = async (userId) => {
+    const { data, error } = await supabase
+      .from('user_upload_counts')
+      .select('total_uploads')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error) throw error
+    return data?.total_uploads ?? 0
+  }
+
   const uploadPDF = async (file, userId) => {
     setLoading(true)
     setError(null)
     setProgress(10)
 
     try {
-      // Check upload count — enforce 3 upload free limit
-      const { count, error: countError } = await supabase
-        .from('uploads')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
+      // Check lifetime upload count — enforce 3 upload free limit
+      const lifetimeCount = await getLifetimeUploadCount(userId)
 
-      if (countError) throw countError
-
-      if (count >= 3) {
+      if (lifetimeCount >= 3) {
         throw new Error('UPLOAD_LIMIT_REACHED')
       }
 
@@ -57,6 +63,9 @@ export const useUpload = () => {
 
       if (dbError) throw dbError
       setProgress(60)
+
+      // Increment lifetime upload counter (never decrements on delete)
+      await supabase.rpc('increment_upload_count', { p_user_id: userId })
 
       try {
         // 4. Download PDF Blob to extract text
@@ -258,5 +267,5 @@ export const useUpload = () => {
     }
   }
 
-  return { uploadPDF, loading, error, progress }
+  return { uploadPDF, loading, error, progress, getLifetimeUploadCount }
 }

@@ -9,6 +9,7 @@ import LoginPage from '../pages/auth/LoginPage'
 import SignupPage from '../pages/auth/SignupPage'
 import DashboardHome from '../pages/dashboard/DashboardHome'
 import UpgradePage from '../pages/dashboard/UpgradePage'
+import AdminDashboard from '../pages/admin/AdminDashboard'
 
 const AppRoutes = () => {
   return (
@@ -53,6 +54,9 @@ const AppRoutes = () => {
               </ProtectedRoute>
             }
           />
+
+          {/* Admin Dashboard — guarded by its own hardcoded login */}
+          <Route path="/admin" element={<AdminDashboard />} />
 
           {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />

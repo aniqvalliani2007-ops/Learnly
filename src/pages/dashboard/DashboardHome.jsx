@@ -136,7 +136,7 @@ function formatAssistantResponse(text) {
 
 export default function DashboardHome() {
   const { user, logout } = useAuth()
-  const { uploadPDF, progress: uploadProgress, loading: isUploading, error: uploadError } = useUpload()
+  const { uploadPDF, progress: uploadProgress, loading: isUploading, error: uploadError, getLifetimeUploadCount } = useUpload()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -213,6 +213,7 @@ export default function DashboardHome() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(false)
+  const [lifetimeUploads, setLifetimeUploads] = useState(0)
 
   const chatEndRef = useRef(null)
 
@@ -235,6 +236,14 @@ export default function DashboardHome() {
   useEffect(() => {
     fetchUploads()
   }, [user])
+
+  // Load lifetime upload count for limit enforcement
+  useEffect(() => {
+    if (!user) return
+    getLifetimeUploadCount(user.id)
+      .then(count => setLifetimeUploads(count))
+      .catch(() => {})
+  }, [user, uploads])
 
   // Sync selected ID from URL params or set default
   useEffect(() => {
@@ -532,7 +541,7 @@ export default function DashboardHome() {
           </div>
 
           {/* New upload shortcut */}
-          {uploads.length >= 3 ? (
+          {lifetimeUploads >= 3 ? (
             <button
               onClick={() => navigate('/upgrade')}
               className="flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-[4px] transition-all shadow-sm"
@@ -558,19 +567,19 @@ export default function DashboardHome() {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
               <span className="uppercase tracking-widest">Free Usage</span>
-              <span className={uploads.length >= 3 ? 'text-rose-400 font-bold' : 'text-zinc-400'}>
-                {uploads.length} / 3 uploads
+              <span className={lifetimeUploads >= 3 ? 'text-rose-400 font-bold' : 'text-zinc-400'}>
+                {lifetimeUploads} / 3 uploads
               </span>
             </div>
             <div className="w-full h-1 rounded-full bg-zinc-800 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
-                  uploads.length >= 3 ? 'bg-rose-500' : uploads.length === 2 ? 'bg-amber-500' : 'bg-indigo-500'
+                  lifetimeUploads >= 3 ? 'bg-rose-500' : lifetimeUploads === 2 ? 'bg-amber-500' : 'bg-indigo-500'
                 }`}
-                style={{ width: `${Math.min((uploads.length / 3) * 100, 100)}%` }}
+                style={{ width: `${Math.min((lifetimeUploads / 3) * 100, 100)}%` }}
               />
             </div>
-            {uploads.length >= 3 && (
+            {lifetimeUploads >= 3 && (
               <p className="text-[10px] text-rose-400 font-mono">Limit reached — upgrade to continue</p>
             )}
           </div>
@@ -615,21 +624,21 @@ export default function DashboardHome() {
         </div>
 
         {/* Upgrade CTA — only show when at or near limit */}
-        {uploads.length >= 2 && (
+        {lifetimeUploads >= 2 && (
           <div className="px-5 pb-3">
             <div className={`p-3.5 rounded-[4px] border space-y-2.5 ${
-              uploads.length >= 3
+              lifetimeUploads >= 3
                 ? 'bg-indigo-500/10 border-indigo-500/25'
                 : 'bg-amber-500/5 border-amber-500/20'
             }`}>
               <div className="flex items-center gap-2">
-                <Zap className={`h-3.5 w-3.5 flex-shrink-0 ${uploads.length >= 3 ? 'text-indigo-400' : 'text-amber-400'}`} />
+                <Zap className={`h-3.5 w-3.5 flex-shrink-0 ${lifetimeUploads >= 3 ? 'text-indigo-400' : 'text-amber-400'}`} />
                 <span className="text-[11px] font-bold text-white">
-                  {uploads.length >= 3 ? 'Free limit reached' : '1 upload remaining'}
+                  {lifetimeUploads >= 3 ? 'Free limit reached' : '1 upload remaining'}
                 </span>
               </div>
               <p className="text-[10px] text-zinc-400 leading-relaxed font-sans">
-                {uploads.length >= 3
+                {lifetimeUploads >= 3
                   ? 'Upgrade to Pro for unlimited uploads and advanced AI features.'
                   : 'Upgrade before you run out to keep your study flow going.'}
               </p>
@@ -821,7 +830,7 @@ export default function DashboardHome() {
 
               {/* Dotted dropzone */}
               {!isUploading ? (
-                uploads.length >= 3 ? (
+                lifetimeUploads >= 3 ? (
                   /* LIMIT REACHED — show upgrade prompt instead of dropzone */
                   <div className="border border-dashed border-rose-500/30 p-8 sm:p-12 rounded-[4px] bg-rose-500/[0.02] flex flex-col items-center justify-center text-center space-y-4">
                     <div className="h-12 w-12 bg-indigo-500/10 border border-indigo-500/20 rounded-[4px] flex items-center justify-center text-indigo-400">
