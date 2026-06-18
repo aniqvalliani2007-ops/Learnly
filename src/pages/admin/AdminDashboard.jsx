@@ -130,9 +130,12 @@ export default function AdminDashboard() {
   const totalUsers   = users.length
   const totalUploads = users.reduce((s, u) => s + (u.lifetime_uploads || 0), 0)
   const atLimit      = users.filter(u => (u.lifetime_uploads || 0) >= 3).length
-  const activeToday  = users.filter(u => {
-    const d = new Date(u.last_sign_in || u.created_at)
-    return Date.now() - d.getTime() < 86400000
+  
+  // Active in last 5 minutes = currently using the app
+  const currentlyActive = users.filter(u => {
+    const lastActivity = new Date(u.last_sign_in || u.created_at)
+    const minutesAgo = (Date.now() - lastActivity.getTime()) / 60000
+    return minutesAgo < 5
   }).length
 
   useEffect(() => {
@@ -292,10 +295,10 @@ export default function AdminDashboard() {
 
         {/* Stats row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard icon={<Users className="h-5 w-5" />}     label="Total Users"      value={totalUsers}   color="indigo" />
-          <StatCard icon={<FileText className="h-5 w-5" />}  label="Total Uploads"    value={totalUploads} color="emerald" sub="all time, cumulative" />
-          <StatCard icon={<TrendingUp className="h-5 w-5" />} label="Active Today"    value={activeToday}  color="amber" sub="signed in last 24h" />
-          <StatCard icon={<Activity className="h-5 w-5" />}  label="At Upload Limit"  value={atLimit}      color="rose" sub="on free plan (3/3)" />
+          <StatCard icon={<Users className="h-5 w-5" />}     label="Total Users"         value={totalUsers}      color="indigo" />
+          <StatCard icon={<FileText className="h-5 w-5" />}  label="Total Uploads"       value={totalUploads}    color="emerald" sub="all time, cumulative" />
+          <StatCard icon={<Activity className="h-5 w-5" />}  label="Currently Active"    value={currentlyActive} color="amber" sub="active in last 5 min" />
+          <StatCard icon={<TrendingUp className="h-5 w-5" />} label="At Upload Limit"    value={atLimit}         color="rose" sub="on free plan (3/3)" />
         </div>
 
         {/* User table */}
@@ -342,6 +345,11 @@ export default function AdminDashboard() {
                 const displayName   = u.full_name || u.email || u.user_id.slice(0, 8) + '...'
                 const displayEmail  = u.email || '—'
                 const joined        = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'
+                
+                // Check if user is currently active (last 5 minutes)
+                const lastActivity = new Date(u.last_sign_in || u.created_at)
+                const minutesAgo = (Date.now() - lastActivity.getTime()) / 60000
+                const isCurrentlyActive = minutesAgo < 5
 
                 return (
                   <div key={u.user_id}>
@@ -349,11 +357,21 @@ export default function AdminDashboard() {
                     <div className="grid grid-cols-12 gap-2 px-4 py-3 items-center hover:bg-white/[0.02] transition-colors">
                       {/* User info */}
                       <div className="col-span-5 flex items-center gap-2.5 min-w-0">
-                        <div className="h-7 w-7 rounded-full bg-zinc-800 border border-white/[0.06] flex items-center justify-center text-[11px] font-bold text-zinc-300 flex-shrink-0 uppercase">
-                          {(u.full_name || u.email || '?')[0]}
+                        <div className="relative">
+                          <div className="h-7 w-7 rounded-full bg-zinc-800 border border-white/[0.06] flex items-center justify-center text-[11px] font-bold text-zinc-300 flex-shrink-0 uppercase">
+                            {(u.full_name || u.email || '?')[0]}
+                          </div>
+                          {isCurrentlyActive && (
+                            <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 bg-emerald-500 border-2 border-zinc-950 rounded-full" title="Active now" />
+                          )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs text-white font-medium truncate">{displayName}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs text-white font-medium truncate">{displayName}</p>
+                            {isCurrentlyActive && (
+                              <span className="text-[8px] text-emerald-400 font-mono uppercase tracking-wider">● LIVE</span>
+                            )}
+                          </div>
                           <p className="text-[10px] text-zinc-500 truncate">{displayEmail}</p>
                           <p className="text-[9px] text-zinc-600 font-mono">Joined {joined}</p>
                         </div>
