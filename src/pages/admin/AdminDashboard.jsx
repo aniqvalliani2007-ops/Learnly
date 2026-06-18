@@ -131,9 +131,10 @@ export default function AdminDashboard() {
   const totalUploads = users.reduce((s, u) => s + (u.lifetime_uploads || 0), 0)
   const atLimit      = users.filter(u => (u.lifetime_uploads || 0) >= 3).length
   
-  // Active in last 5 minutes = currently using the app
+  // Currently active = users with last_activity in the last 5 minutes
   const currentlyActive = users.filter(u => {
-    const lastActivity = new Date(u.last_sign_in || u.created_at)
+    if (!u.last_activity) return false
+    const lastActivity = new Date(u.last_activity)
     const minutesAgo = (Date.now() - lastActivity.getTime()) / 60000
     return minutesAgo < 5
   }).length
@@ -170,6 +171,11 @@ export default function AdminDashboard() {
         .select('id, user_id, file_name, file_size, created_at, status')
         .order('created_at', { ascending: false })
 
+      // Fetch active user sessions (currently active users)
+      const { data: activeSessions = [] } = await supabase
+        .from('user_sessions')
+        .select('user_id, last_activity')
+
       // Build comprehensive user map
       const userMap = {}
 
@@ -182,11 +188,19 @@ export default function AdminDashboard() {
           lifetime_uploads: 0,
           last_sign_in: authUser.last_sign_in_at || authUser.created_at,
           created_at: authUser.created_at,
+          last_activity: null, // Will be filled from sessions
           uploads: [],
         }
       })
 
-      // Priority 2: Merge upload counts (contains email/name for users who uploaded)
+      // Priority 2: Add last_activity from sessions table
+      activeSessions.forEach(session => {
+        if (userMap[session.user_id]) {
+          userMap[session.user_id].last_activity = session.last_activity
+        }
+      })
+
+      // Priority 3: Merge upload counts (contains email/name for users who uploaded)
       counts.forEach(c => {
         if (userMap[c.user_id]) {
           // Update existing entry with upload count
@@ -206,12 +220,13 @@ export default function AdminDashboard() {
             lifetime_uploads: c.total_uploads || 0,
             last_sign_in: c.updated_at,
             created_at: c.created_at,
+            last_activity: null,
             uploads: [],
           }
         }
       })
 
-      // Priority 3: Attach actual upload files to users
+      // Priority 4: Attach actual upload files to users
       uploads.forEach(up => {
         if (userMap[up.user_id]) {
           userMap[up.user_id].uploads.push(up)
@@ -224,15 +239,18 @@ export default function AdminDashboard() {
             lifetime_uploads: 0,
             last_sign_in: up.created_at,
             created_at: up.created_at,
+            last_activity: null,
             uploads: [up],
           }
         }
       })
 
-      // Sort by most recent activity
-      const userList = Object.values(userMap).sort((a, b) =>
-        new Date(b.last_sign_in || b.created_at || 0) - new Date(a.last_sign_in || a.created_at || 0)
-      )
+      // Sort by most recent activity (use last_activity if available, else last_sign_in)
+      const userList = Object.values(userMap).sort((a, b) => {
+        const aTime = new Date(a.last_activity || a.last_sign_in || a.created_at || 0)
+        const bTime = new Date(b.last_activity || b.last_sign_in || b.created_at || 0)
+        return bTime - aTime
+      })
 
       console.log(`📊 Total users in dashboard: ${userList.length}`)
       setUsers(userList)
@@ -346,10 +364,12 @@ export default function AdminDashboard() {
                 const displayEmail  = u.email || '—'
                 const joined        = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'
                 
-                // Check if user is currently active (last 5 minutes)
-                const lastActivity = new Date(u.last_sign_in || u.created_at)
-                const minutesAgo = (Date.now() - lastActivity.getTime()) / 60000
-                const isCurrentlyActive = minutesAgo < 5
+                // Check if user is currently active based on last_activity (not last_sign_in)
+                const isCurrentlyActive = u.last_activity && (() => {
+                  const lastActivity = new Date(u.last_activity)
+                  const minutesAgo = (Date.now() - lastActivity.getTime()) / 60000
+                  return minutesAgo < 5
+                })()
 
                 return (
                   <div key={u.user_id}>
