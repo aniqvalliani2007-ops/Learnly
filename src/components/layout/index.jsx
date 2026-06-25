@@ -3,18 +3,14 @@ import Footer from './Footer'
 
 export const LandingLayout = ({ children }) => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#080808] text-zinc-300 font-sans antialiased selection:bg-white/10 selection:text-white relative overflow-hidden">
-      {/* Background glowing decorations */}
-      <div className="absolute top-[20%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] glow-orb pointer-events-none" />
-      <div className="absolute top-[60%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] glow-orb pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%)' }} />
-      <div className="absolute bottom-[-10%] left-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] glow-orb pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(147, 51, 234, 0.06) 0%, transparent 70%)' }} />
+    <div className="min-h-screen flex flex-col bg-black text-white font-sans antialiased selection:bg-primary/30 selection:text-white relative overflow-hidden">
+      {/* Background glowing decorations - keeping very subtle */}
+      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
       
-      {/* Background Dot pattern overlay */}
-      <div className="absolute inset-0 bg-dot-pattern opacity-100 pointer-events-none z-0" />
-
       <div className="relative z-10 flex-1 flex flex-col">
         <Navbar />
-        <main className="flex-1">
+        <main className="flex-1 w-full flex flex-col items-center">
           {children}
         </main>
         <Footer />

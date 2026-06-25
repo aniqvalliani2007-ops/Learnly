@@ -1,159 +1,162 @@
-import { Sparkles, ArrowRight, FileText, MessageSquare, Brain } from 'lucide-react'
+import { ArrowRight, Play, BookOpen, Layers, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 
 export const HeroSection = () => {
-  const handleScrollToHowItWorks = (e) => {
-    e.preventDefault()
-    const element = document.getElementById('how-it-works')
-    if (element) {
-      const yOffset = -80 // Offset to keep headings clear of the sticky navbar
-      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset
-      window.scrollTo({ top: y, behavior: 'smooth' })
-    }
-  }
+  const containerRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  })
+
+  // Parallax effects for the mockup
+  const y = useTransform(scrollYProgress, [0, 1], [0, 200])
+  const scale = useTransform(scrollYProgress, [0, 0.5], [0.95, 1])
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [0.5, 1])
 
   return (
-    <section className="relative pt-20 pb-28 border-b border-white/[0.06] overflow-hidden">
-      {/* Grid line framing characteristic of Attio style */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 z-0 pointer-events-none" />
-      
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto">
-          {/* Tagline Badge */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[4px] bg-zinc-900 border border-zinc-800 text-[11px] font-medium text-zinc-300 uppercase tracking-wider mb-8 shadow-sm">
-            <Sparkles className="h-3 w-3 text-indigo-400 animate-pulse" />
-            <span>AI-Powered Active Learning</span>
-          </div>
+    <section ref={containerRef} className="relative pt-24 pb-32 overflow-hidden flex flex-col items-center w-full">
+      <div className="max-w-5xl mx-auto px-6 relative z-10 w-full">
+        <div className="text-center max-w-4xl mx-auto flex flex-col items-center">
+          
+          {/* Animated Pill Badge */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-white/10 text-xs font-medium text-zinc-300 tracking-wide mb-8"
+          >
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            The intelligent platform for modern learning
+          </motion.div>
 
-          {/* Heading */}
-          <h1 className="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
-            Transform your PDFs <br className="hidden sm:inline" />
-            into <span className="bg-gradient-to-r from-zinc-200 via-white to-zinc-400 text-transparent bg-clip-text">interactive study guides</span>
-          </h1>
+          {/* Main Heading */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+            className="font-sans text-5xl md:text-7xl font-bold tracking-tighter text-white leading-[1.05]"
+          >
+            The system that knows <br className="hidden md:block" /> learning like you do.
+          </motion.h1>
 
           {/* Subtitle */}
-          <p className="mt-6 text-base md:text-lg text-zinc-400 max-w-2xl mx-auto font-sans leading-relaxed">
-            Upload lecture notes, textbooks, or research papers. Learnly's AI instantly constructs smart summaries, automated flashcards, and custom practice quizzes.
-          </p>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            className="mt-6 text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto font-sans leading-relaxed"
+          >
+            Far from just another study tool, Learnly is the all-in-one operating system designed specifically to transform your study materials into interactive mastery.
+          </motion.p>
 
           {/* Call to Actions */}
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link to="/signup">
-              <button className="flex items-center gap-2 bg-white hover:bg-zinc-200 text-black text-xs font-semibold px-5 py-2.5 rounded-[4px] border border-white/20 transition-all shadow-md group">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto"
+          >
+            <Link to="/signup" className="w-full sm:w-auto">
+              <button className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-orange-600 text-white text-base font-semibold px-8 py-4 rounded-full transition-all shadow-[0_0_20px_rgba(217,98,38,0.3)] hover:scale-105 active:scale-95">
                 Start Learning Free
-                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </button>
             </Link>
-            <a href="#how-it-works" onClick={handleScrollToHowItWorks}>
-              <button className="bg-white/[0.03] hover:bg-white/[0.07] text-zinc-300 text-xs font-semibold px-5 py-2.5 rounded-[4px] border border-white/[0.08] transition-all">
-                See How It Works
+            <a href="#how-it-works" className="w-full sm:w-auto">
+              <button className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white text-base font-semibold px-8 py-4 rounded-full border border-white/10 transition-all">
+                <Play className="w-4 h-4" />
+                See it in action
               </button>
             </a>
-          </div>
+          </motion.div>
         </div>
 
-        {/* Product Mockup UI (Attio-style Glassy Dashboard) */}
-        <div className="mt-20 max-w-5xl mx-auto relative group">
-          {/* Glassy border layout wrapping the mockup */}
-          <div className="absolute -inset-px bg-gradient-to-t from-white/10 to-transparent opacity-30 blur-sm group-hover:opacity-45 transition-opacity rounded-[4px]" />
+        {/* Parallax Mockup UI */}
+        <motion.div 
+          style={{ y, scale, opacity }}
+          className="mt-24 w-full max-w-5xl mx-auto relative group z-20 perspective-[2000px]"
+        >
+          {/* Subtle glow behind mockup */}
+          <div className="absolute -inset-4 bg-primary/20 blur-[100px] rounded-full opacity-50 pointer-events-none" />
           
-          <div className="relative glass-card rounded-[4px] overflow-hidden border border-white/[0.08] shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-            {/* Window bar */}
-            <div className="h-9 bg-zinc-950/90 border-b border-white/[0.06] flex items-center justify-between px-4">
-              <div className="flex gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-zinc-800" />
-                <span className="w-2 h-2 rounded-full bg-zinc-800" />
-                <span className="w-2 h-2 rounded-full bg-zinc-800" />
+          <div className="relative glass-panel rounded-xl overflow-hidden border border-white/10 shadow-[0_40px_80px_rgba(0,0,0,0.8)] flex flex-col bg-zinc-950">
+            {/* Top Bar */}
+            <div className="h-12 bg-zinc-900 border-b border-white/10 flex items-center justify-between px-4">
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
-              <div className="text-[10px] text-zinc-500 font-mono">learnly-workspace-main.pdf</div>
-              <div className="w-8" />
+              <div className="flex bg-black/50 rounded-lg p-1">
+                <div className="px-4 py-1 rounded-md bg-zinc-800 text-xs font-medium text-white shadow-sm">Dashboard</div>
+                <div className="px-4 py-1 rounded-md text-xs font-medium text-neutral-400">Library</div>
+                <div className="px-4 py-1 rounded-md text-xs font-medium text-neutral-400">Analytics</div>
+              </div>
+              <div className="w-16" /> {/* spacer */}
             </div>
 
-            {/* Simulated App Grid Workspace */}
-            <div className="grid grid-cols-12 h-[340px] md:h-[420px] bg-zinc-950/60 font-sans text-xs">
-              {/* Sidebar: 2 cols */}
-              <div className="col-span-2 border-r border-white/[0.05] p-3 hidden sm:flex flex-col gap-4 text-zinc-500 font-medium">
-                <div className="flex items-center gap-1.5 text-zinc-200">
-                  <span className="h-4 w-4 rounded-[2px] bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-[10px] text-indigo-400 font-bold">L</span>
-                  <span>Workspace</span>
-                </div>
-                <div className="space-y-1">
-                  <div className="px-2 py-1.5 bg-white/[0.03] text-zinc-300 rounded-[2px] flex items-center gap-2">
-                    <FileText className="h-3 w-3 text-zinc-400" />
-                    <span>My PDFs</span>
+            {/* Dashboard Content Mockup */}
+            <div className="h-[400px] md:h-[500px] grid grid-cols-12 gap-px bg-white/5">
+              
+              {/* Sidebar */}
+              <div className="col-span-3 bg-zinc-950 p-6 flex flex-col gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
+                    <BookOpen className="w-4 h-4 text-white" />
                   </div>
-                  <div className="px-2 py-1.5 hover:text-zinc-300 rounded-[2px] flex items-center gap-2 cursor-pointer transition-colors">
-                    <Brain className="h-3 w-3 text-zinc-500" />
-                    <span>Quizzes</span>
+                  <div>
+                    <div className="text-sm font-semibold text-white">Learnly Pro</div>
+                    <div className="text-xs text-neutral-500">Workspace</div>
                   </div>
-                  <div className="px-2 py-1.5 hover:text-zinc-300 rounded-[2px] flex items-center gap-2 cursor-pointer transition-colors">
-                    <MessageSquare className="h-3 w-3 text-zinc-500" />
-                    <span>AI Assistant</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* PDF Viewer Mockup: 6 cols */}
-              <div className="col-span-12 sm:col-span-6 p-4 flex flex-col gap-3 border-r border-white/[0.05]">
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2 text-[10px] text-zinc-500">
-                  <span>Biology_Ch4_Photosynthesis.pdf</span>
-                  <span>Page 1 of 18</span>
                 </div>
                 
-                <div className="space-y-2.5 overflow-hidden">
-                  <div className="h-4 bg-white/[0.08] w-2/3 rounded-[2px]" />
-                  <div className="space-y-1.5">
-                    <div className="h-3 bg-white/[0.04] w-full rounded-[2px]" />
-                    <div className="h-3 bg-white/[0.04] w-full rounded-[2px]" />
-                    <div className="h-3 bg-white/[0.04] w-5/6 rounded-[2px]" />
-                    <div className="h-auto bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-350 px-2 py-1.5 w-11/12 rounded-[2px] flex items-start gap-1.5">
-                      <Sparkles className="h-3 w-3 text-indigo-400 flex-shrink-0 mt-0.5" />
-                      <span>Highlight: Light-dependent reactions capture energy from sunlight...</span>
-                    </div>
-                    <div className="h-3 bg-white/[0.04] w-full rounded-[2px]" />
-                    <div className="h-3 bg-white/[0.04] w-4/5 rounded-[2px]" />
+                <div className="space-y-1">
+                  <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Menu</div>
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5 text-primary">
+                    <Layers className="w-4 h-4" />
+                    <span className="text-sm font-medium">Courses</span>
                   </div>
-
-                  <div className="mt-4 pt-4 border-t border-white/[0.05] space-y-2">
-                    <div className="h-4 bg-white/[0.08] w-1/3 rounded-[2px]" />
-                    <div className="h-3 bg-white/[0.04] w-full rounded-[2px]" />
-                    <div className="h-3 bg-white/[0.04] w-full rounded-[2px]" />
+                  <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-neutral-400 hover:text-white transition-colors">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="text-sm font-medium">Quizzes</span>
                   </div>
                 </div>
               </div>
 
-              {/* AI Study Panel Mockup: 4 cols */}
-              <div className="col-span-12 sm:col-span-4 p-4 flex flex-col gap-4 bg-zinc-950/20">
-                <div className="flex items-center gap-1.5 border-b border-white/[0.05] pb-2">
-                  <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-                  <span className="font-semibold text-zinc-200">Study Assistant</span>
+              {/* Main Content Area */}
+              <div className="col-span-9 bg-black p-8 flex flex-col gap-6">
+                <div className="flex justify-between items-end">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white mb-1">Welcome back, Alex</h2>
+                    <p className="text-neutral-400 text-sm">Here's your learning progress for today.</p>
+                  </div>
+                  <div className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold">
+                    Resume Course
+                  </div>
                 </div>
 
-                <div className="flex-1 flex flex-col gap-3 justify-between">
-                  {/* Generated Quiz Card */}
-                  <div className="bg-zinc-900 border border-white/[0.06] p-3 rounded-[2px] space-y-2 shadow-sm">
-                    <div className="flex justify-between items-center text-[9px] text-indigo-400 uppercase font-bold tracking-wider">
-                      <span>Practice Quiz</span>
-                      <span className="px-1.5 py-0.5 rounded-[2px] bg-indigo-500/10 border border-indigo-500/20">Q1 of 5</span>
+                <div className="grid grid-cols-3 gap-4">
+                  {[1,2,3].map((i) => (
+                    <div key={i} className="bg-zinc-900 border border-white/5 rounded-xl p-5 flex flex-col gap-4">
+                      <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center">
+                        <BookOpen className="w-5 h-5 text-neutral-400" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-neutral-400 mb-1">Module {i}</div>
+                        <div className="text-lg font-semibold text-white">Advanced Genetics</div>
+                      </div>
+                      <div className="w-full bg-black rounded-full h-2 mt-auto">
+                        <div className="bg-primary h-full rounded-full" style={{ width: `${i * 30}%` }} />
+                      </div>
                     </div>
-                    <p className="text-zinc-200 font-medium text-[11px] leading-snug">What is the primary function of chlorophyll in photosynthesis?</p>
-                    <div className="space-y-1 mt-1 text-[10px]">
-                      <div className="px-2 py-1 rounded-[2px] bg-zinc-950 border border-white/[0.05] text-zinc-400 hover:text-white cursor-pointer transition-colors">A. To produce oxygen gas</div>
-                      <div className="px-2 py-1 rounded-[2px] bg-indigo-500/10 border border-indigo-500/30 text-indigo-200">B. To absorb light energy from the sun</div>
-                      <div className="px-2 py-1 rounded-[2px] bg-zinc-950 border border-white/[0.05] text-zinc-400 hover:text-white cursor-pointer transition-colors">C. To convert water into glucose</div>
-                    </div>
-                  </div>
-
-                  {/* Ask Question Input */}
-                  <div className="border border-white/[0.06] bg-zinc-900/60 p-1.5 rounded-[2px] flex items-center justify-between gap-2">
-                    <span className="text-zinc-500 px-1 text-[10px]">Ask the AI about page 1...</span>
-                    <button className="h-5 px-2 bg-indigo-600 text-[9px] font-semibold text-white rounded-[2px] hover:bg-indigo-500 transition-colors">Send</button>
-                  </div>
+                  ))}
                 </div>
               </div>
+
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

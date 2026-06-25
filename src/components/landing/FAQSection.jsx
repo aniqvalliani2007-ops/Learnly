@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Minus } from 'lucide-react'
 
 export const FAQSection = () => {
@@ -28,53 +29,63 @@ export const FAQSection = () => {
   }
 
   return (
-    <section id="faq" className="py-24 border-b border-white/[0.06] relative">
-      <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
+    <section id="faq" className="py-32 bg-black border-y border-white/5 relative">
+      <div className="max-w-3xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="text-center mb-20">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">HELP SYSTEM</span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mt-2 tracking-tight">
+        <div className="mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tight"
+          >
             Frequently Asked Questions
-          </h2>
-          <p className="mt-4 text-zinc-400 text-sm leading-relaxed max-w-md mx-auto">
-            Everything you need to know about the Learnly platform, plans, and features.
-          </p>
+          </motion.h2>
         </div>
 
         {/* FAQ List */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((faq, index) => {
             const isOpen = activeIndex === index
             return (
-              <div 
+              <motion.div 
                 key={index} 
-                className="glass-card rounded-[4px] border border-white/[0.08] overflow-hidden transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className="bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden"
               >
                 <button
                   onClick={() => toggle(index)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/[0.02] transition-colors"
+                  className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
-                  <span className="text-xs font-semibold text-white font-display tracking-tight">{faq.q}</span>
-                  {isOpen ? (
-                    <Minus className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0 ml-4" />
-                  ) : (
-                    <Plus className="h-3.5 w-3.5 text-zinc-400 flex-shrink-0 ml-4" />
-                  )}
+                  <span className="text-lg font-bold text-white font-sans tracking-tight pr-8">{faq.q}</span>
+                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-neutral-400'}`}>
+                    {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  </div>
                 </button>
                 
-                {/* Content with transition height */}
-                <div 
-                  className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${
-                    isOpen ? 'max-h-40 pb-5 pt-1' : 'max-h-0'
-                  }`}
-                >
-                  <p className="text-zinc-400 text-xs leading-relaxed font-sans">
-                    {faq.a}
-                  </p>
-                </div>
-              </div>
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-8 pb-8 pt-2">
+                        <p className="text-neutral-400 text-base leading-relaxed font-sans">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             )
           })}
         </div>

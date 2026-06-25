@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -26,64 +27,82 @@ export const PricingSection = () => {
       price: '29.99', 
       period: 'month',
       description: 'For shared workspaces and collaboration.',
-      features: ['Shared document spaces', 'Shared study folders', 'Team analytics dashboards', 'Consolidated billing invoice', '24/7 dedicated support representative'],
+      features: ['Shared document spaces', 'Shared study folders', 'Team analytics dashboards', 'Consolidated billing invoice', '24/7 dedicated support'],
       cta: 'Contact Team',
       popular: false,
     },
   ]
 
   return (
-    <section id="pricing" className="py-24 border-b border-white/[0.06] relative">
-      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+    <section id="pricing" className="py-32 bg-zinc-950 border-y border-white/5 relative">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
-        <div className="max-w-2xl mx-auto text-center mb-20">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Pricing Tiers</span>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-white mt-2 tracking-tight">
-            Transparent pricing, tailored to your studies
-          </h2>
-          <p className="mt-4 text-zinc-400 text-sm leading-relaxed">
-            Choose a plan that fits your workload. Cancel, upgrade, or downgrade anytime.
-          </p>
+        <div className="text-center mb-20">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tight"
+          >
+            Transparent pricing
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-6 text-lg text-neutral-400 font-sans"
+          >
+            Choose a plan that fits your workload. Cancel anytime.
+          </motion.p>
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
-            <div 
-              key={index} 
-              className={`glass-card p-8 rounded-[4px] border flex flex-col justify-between relative h-full ${
+            <motion.div 
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
+              className={`p-8 rounded-2xl flex flex-col justify-between relative h-full bg-black ${
                 plan.popular 
-                  ? 'border-indigo-500/40 bg-indigo-500/[0.02] shadow-[0_4px_30px_rgba(99,102,241,0.05)]' 
-                  : 'border-white/[0.08] hover:border-white/20'
+                  ? 'border-2 border-primary shadow-[0_0_30px_rgba(217,98,38,0.15)] scale-105 z-10' 
+                  : 'border border-white/10'
               }`}
             >
               {plan.popular && (
-                <span className="absolute -top-2.5 left-6 px-2 py-0.5 rounded-[2px] bg-indigo-600 text-[9px] font-bold text-white uppercase tracking-wider">
-                  Most Popular
-                </span>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <span className="px-4 py-1 rounded-full bg-primary text-xs font-bold text-white uppercase tracking-wider shadow-md">
+                    Most Popular
+                  </span>
+                </div>
               )}
               
               <div>
                 {/* Header */}
-                <h3 className="text-sm font-semibold text-white uppercase tracking-wide font-mono">{plan.name}</h3>
-                <p className="text-[11px] text-zinc-400 mt-1.5 min-h-[32px]">{plan.description}</p>
+                <h3 className="text-xl font-bold text-white tracking-tight">{plan.name}</h3>
+                <p className="text-sm text-neutral-400 mt-2 min-h-[40px]">{plan.description}</p>
                 
                 {/* Pricing block */}
                 <div className="mt-6 flex items-baseline gap-1 text-white">
-                  <span className="text-3xl font-extrabold font-display">${plan.price}</span>
-                  <span className="text-zinc-500 text-xs font-medium">/{plan.period}</span>
+                  <span className="text-5xl font-bold tracking-tighter">${plan.price}</span>
+                  <span className="text-neutral-500 font-medium">/{plan.period}</span>
                 </div>
 
                 {/* Divider */}
-                <div className="h-[1px] bg-white/[0.06] my-6" />
+                <div className="h-px bg-white/10 my-8 w-full" />
 
                 {/* Features */}
-                <ul className="space-y-3.5 mb-8">
+                <ul className="space-y-4 mb-10">
                   {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
-                      <Check className={`h-4 w-4 flex-shrink-0 mt-0.5 ${plan.popular ? 'text-indigo-400' : 'text-zinc-500'}`} />
+                    <li key={i} className="flex items-start gap-3 text-sm text-neutral-300">
+                      <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${plan.popular ? 'bg-primary/20' : 'bg-white/5'}`}>
+                        <Check className={`w-3 h-3 ${plan.popular ? 'text-primary' : 'text-neutral-400'}`} />
+                      </div>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -93,16 +112,16 @@ export const PricingSection = () => {
               {/* Call to Action Button */}
               <Link to="/signup" className="w-full">
                 <button 
-                  className={`w-full py-2 px-4 rounded-[4px] text-xs font-semibold transition-all ${
+                  className={`w-full py-4 rounded-full text-base font-bold transition-all ${
                     plan.popular
-                      ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md'
-                      : 'bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 border border-white/[0.08]'
+                      ? 'bg-primary hover:bg-orange-600 text-white'
+                      : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
                   }`}
                 >
                   {plan.cta}
                 </button>
               </Link>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
