@@ -29,17 +29,17 @@ export const FAQSection = () => {
   }
 
   return (
-    <section id="faq" className="py-32 bg-black border-y border-white/5 relative">
+    <section id="faq" className="py-24 bg-black border-y border-white/5 relative">
       <div className="max-w-3xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}
         <div className="mb-16">
           <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="font-sans text-4xl md:text-5xl font-bold text-white tracking-tight"
+            transition={{ duration: 0.5 }}
+            className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight"
           >
             Frequently Asked Questions
           </motion.h2>
@@ -52,19 +52,19 @@ export const FAQSection = () => {
             return (
               <motion.div 
                 key={index} 
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-zinc-900/50 rounded-xl border border-white/5 overflow-hidden"
+                className="bg-zinc-900/50 rounded-[4px] border border-white/5 overflow-hidden"
               >
                 <button
                   onClick={() => toggle(index)}
-                  className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
-                  <span className="text-lg font-bold text-white font-sans tracking-tight pr-8">{faq.q}</span>
-                  <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-neutral-400'}`}>
-                    {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  <span className="text-base font-bold text-white font-sans tracking-tight pr-6">{faq.q}</span>
+                  <div className={`shrink-0 w-6 h-6 rounded-[2px] flex items-center justify-center transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-neutral-400'}`}>
+                    {isOpen ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
                   </div>
                 </button>
                 
@@ -77,8 +77,8 @@ export const FAQSection = () => {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="px-8 pb-8 pt-2">
-                        <p className="text-neutral-400 text-base leading-relaxed font-sans">
+                      <div className="px-6 pb-6 pt-1">
+                        <p className="text-neutral-400 text-sm leading-relaxed font-sans">
                           {faq.a}
                         </p>
                       </div>
