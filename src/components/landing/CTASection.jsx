@@ -1,55 +1,72 @@
-import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
-export const CTASection = () => {
+export default function CTASection() {
+  const navigate = useNavigate()
+
   return (
-    <section className="py-24 relative overflow-hidden bg-black">
-      {/* Background glowing orb */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
+    <section className="relative py-32 bg-black overflow-hidden">
+      {/* Background effects */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-indigo-950/20 to-black"></div>
+      <div className="absolute inset-0" style={{
+        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 70%)'
+      }}></div>
 
-      <div className="max-w-4xl mx-auto px-6 relative z-10 text-center flex flex-col items-center">
-        <motion.h2 
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="font-sans text-4xl md:text-6xl font-bold text-white tracking-tighter mb-6 leading-[1.1]"
-        >
-          Spend 50% less time <br /> on the stuff you hate.
-        </motion.h2>
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        
+        {/* Heading */}
+        <div className="space-y-6 mb-12 animate-fade-in-up">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
+            READY TO TRANSFORM
+            <span className="block mt-2 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              YOUR LEARNING?
+            </span>
+          </h2>
+          <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl mx-auto leading-relaxed font-light">
+            Join thousands of students already learning smarter with Learnly
+          </p>
+        </div>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-neutral-400 text-base md:text-lg mb-10 max-w-2xl mx-auto"
-        >
-          Stop struggling with static notes. Let Learnly automate your flashcards, summarize your lectures, and build custom quizzes in seconds.
-        </motion.p>
+        {/* CTA Button */}
+        <div className="flex justify-center animate-fade-in-up animation-delay-200">
+          <button
+            onClick={() => navigate('/signup')}
+            className="group relative px-12 py-6 bg-white text-black rounded-full font-bold text-xl hover:bg-zinc-100 transition-all duration-300 hover:scale-105 shadow-2xl shadow-white/20 flex items-center gap-3"
+          >
+            Start For Free
+            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-col sm:flex-row justify-center gap-3 w-full sm:w-auto"
-        >
-          <Link to="/signup" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto bg-white hover:bg-neutral-200 text-black text-sm font-semibold px-8 py-3 rounded-[2px] transition-all">
-              Start Learning Free
-            </button>
-          </Link>
-          <Link to="/login" className="w-full sm:w-auto">
-            <button className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/5 text-sm font-semibold px-8 py-3 rounded-[2px] transition-all">
-              Sign In
-            </button>
-          </Link>
-        </motion.div>
+        {/* Subtext */}
+        <p className="text-sm text-zinc-600 mt-8 animate-fade-in-up animation-delay-400">
+          No credit card required • Free plan available • Cancel anytime
+        </p>
       </div>
+
+      <style>{`
+        @keyframes fade-in-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fade-in-up 1s ease-out forwards;
+        }
+        .animation-delay-200 {
+          animation-delay: 0.2s;
+          opacity: 0;
+        }
+        .animation-delay-400 {
+          animation-delay: 0.4s;
+          opacity: 0;
+        }
+      `}</style>
     </section>
   )
 }
-
-export default CTASection
-

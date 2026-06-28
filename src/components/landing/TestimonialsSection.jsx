@@ -1,88 +1,125 @@
-import { motion } from 'framer-motion'
-import { Star } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
-export const TestimonialsSection = () => {
-  const testimonials = [
-    { 
-      name: 'Johnathan K.', 
-      role: 'Pre-Med Student, NYU',
-      text: "I'm happier, my study groups are happier, my grades are higher. It's really been a life changing thing for my medical degree.",
-    },
-    { 
-      name: 'Sarah M.', 
-      role: 'Law School Candidate',
-      text: "The AI summaries are incredibly precise. It extracts key legal arguments and definitions accurately, making case briefings much more structured.",
-    },
-    { 
-      name: 'Michael T.', 
-      role: 'CS Undergraduate',
-      text: "Best academic utility I have added to my study suite. Generating practice quiz sets directly from lecture slide decks is a complete game-changer.",
-    },
-  ]
+const testimonials = [
+  {
+    name: "Sarah Johnson",
+    role: "Medical Student",
+    text: "Learnly has been the best study tool I've ever used. The AI-generated summaries and flashcards have directly helped me ace my exams. It's like having a personal tutor available 24/7."
+  },
+  {
+    name: "David Chen",
+    role: "Engineering Student",
+    text: "I've never seen a more effective study platform. The quiz generation is incredibly accurate and helps me identify exactly what I need to focus on."
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Law Student",
+    text: "The instant study guides feature has genuinely changed my study routine. It's helped me become more efficient and deeply engaged with complex legal materials."
+  },
+  {
+    name: "Michael Brown",
+    role: "Business Student",
+    text: "Learnly is the highest ROI tool for students. Imagine having instant summaries and quizzes for every document you need to study. That's Learnly."
+  },
+  {
+    name: "Olivia Martinez",
+    role: "Psychology Student",
+    text: "The flashcard system is brilliant. I can review key concepts anywhere, anytime. It's made studying actually enjoyable."
+  },
+  {
+    name: "James Wilson",
+    role: "Computer Science Student",
+    text: "Learnly is far more than just a study app; it's a complete learning system. The AI assistant understands context and provides relevant explanations."
+  },
+  {
+    name: "Sophie Taylor",
+    role: "Biology Student",
+    text: "I've tried many study tools, but Learnly stands out. The quality of AI-generated content is exceptional, and it saves me hours every week."
+  },
+  {
+    name: "Alex Kumar",
+    role: "MBA Candidate",
+    text: "Learnly gave me permission to study smarter, not harder. The personalized quizzes help me focus on weak areas and track my progress effectively."
+  },
+]
+
+export default function TestimonialsSection() {
+  const scrollRef = useRef(null)
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current
+    if (!scrollContainer) return
+
+    let scrollAmount = 0
+    const scroll = () => {
+      scrollAmount += 0.5
+      if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+        scrollAmount = 0
+      }
+      scrollContainer.scrollLeft = scrollAmount
+    }
+
+    const interval = setInterval(scroll, 30)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Duplicate testimonials for seamless loop
+  const doubledTestimonials = [...testimonials, ...testimonials]
 
   return (
-    <section className="py-24 bg-black border-y border-white/5 relative overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
-        
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight"
-          >
-            Students, in their own words
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-5 text-base md:text-lg text-neutral-400 font-sans max-w-2xl mx-auto"
-          >
-            Join thousands of students who have upgraded their academic workflow with Learnly.
-          </motion.p>
+    <section className="relative py-32 bg-black overflow-hidden">
+      {/* Subtle background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-zinc-950 opacity-50"></div>
+      
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div className="text-center space-y-4">
+          <p className="text-sm text-zinc-600 uppercase tracking-[0.2em]">TESTIMONIALS</p>
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">
+            LOVED BY STUDENTS
+          </h2>
         </div>
+      </div>
 
-        {/* Glassy Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
+      {/* Scrolling testimonials */}
+      <div className="relative">
+        {/* Left fade */}
+        <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none"></div>
+        
+        {/* Right fade */}
+        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-black to-transparent z-10 pointer-events-none"></div>
+
+        <div 
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-hidden py-4"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {doubledTestimonials.map((testimonial, index) => (
+            <div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white/[0.02] border border-white/5 p-8 rounded-[4px] relative overflow-hidden flex flex-col justify-between h-full group hover:border-white/10 hover:bg-white/[0.04] transition-all"
+              className="flex-shrink-0 w-[400px] bg-zinc-950/50 border border-zinc-800 rounded-lg p-8 backdrop-blur-sm"
             >
-              {/* Subtle top glow on hover */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-primary/0 group-hover:bg-primary/50 group-hover:blur-[8px] transition-all duration-500" />
-              
-              <div>
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-primary text-primary" />
-                  ))}
+              <p className="text-zinc-300 text-base leading-relaxed mb-6">
+                "{testimonial.text}"
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                  {testimonial.name.charAt(0)}
                 </div>
-                
-                <p className="font-serif text-base md:text-lg text-neutral-300 leading-relaxed italic">
-                  "{testimonial.text}"
-                </p>
+                <div>
+                  <p className="text-white font-semibold text-sm">{testimonial.name}</p>
+                  <p className="text-zinc-500 text-xs">{testimonial.role}</p>
+                </div>
               </div>
-
-              <div className="mt-8 pt-6 border-t border-white/5 flex flex-col">
-                <span className="text-sm font-bold text-white font-sans">{testimonial.name}</span>
-                <span className="text-xs text-neutral-500 font-sans mt-1">{testimonial.role}</span>
-              </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
+
+      <style>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   )
 }
-
-export default TestimonialsSection
-

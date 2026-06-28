@@ -67,27 +67,6 @@ export const Navbar = () => {
             >
               Features
             </a>
-            <a 
-              href="#how-it-works" 
-              onClick={(e) => handleScrollToSection(e, 'how-it-works')}
-              className="text-xs font-medium text-neutral-400 hover:text-white transition-colors"
-            >
-              How it Works
-            </a>
-            <a 
-              href="#pricing" 
-              onClick={(e) => handleScrollToSection(e, 'pricing')}
-              className="text-xs font-medium text-neutral-400 hover:text-white transition-colors"
-            >
-              Pricing
-            </a>
-            <a 
-              href="#faq" 
-              onClick={(e) => handleScrollToSection(e, 'faq')}
-              className="text-xs font-medium text-neutral-400 hover:text-white transition-colors"
-            >
-              FAQ
-            </a>
           </div>
         </div>
 
@@ -115,7 +94,7 @@ export const Navbar = () => {
               </Link>
               <Link to="/signup">
                 <button className="text-xs font-semibold bg-white hover:bg-zinc-200 text-black px-4 py-1.5 rounded-[2px] transition-all">
-                  Book a demo
+                  Get Started
                 </button>
               </Link>
             </>
