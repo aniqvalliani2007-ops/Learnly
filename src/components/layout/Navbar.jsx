@@ -54,8 +54,8 @@ export const Navbar = () => {
     <nav className="glass-header sticky top-0 z-50 h-14 w-full transition-all">
       <div className="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
         <div className="flex items-center gap-10">
-          <Link to="/" className="text-[15px] font-semibold tracking-tight font-sans text-white flex items-center gap-2">
-            <span className="h-6 w-6 bg-white flex items-center justify-center text-black text-xs font-black rounded-[2px]">L</span>
+          <Link to="/" className="text-base font-semibold tracking-tight font-sans text-white flex items-center gap-2">
+            <span className="h-6 w-6 bg-white flex items-center justify-center text-black text-xs font-black rounded-sm">L</span>
             Learnly
           </Link>
           
@@ -63,9 +63,30 @@ export const Navbar = () => {
             <a 
               href="#features" 
               onClick={(e) => handleScrollToSection(e, 'features')}
-              className="text-xs font-medium text-neutral-400 hover:text-white transition-colors"
+              className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
             >
               Features
+            </a>
+            <a 
+              href="#how-it-works" 
+              onClick={(e) => handleScrollToSection(e, 'how-it-works')}
+              className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+            >
+              How it Works
+            </a>
+            <a 
+              href="#pricing" 
+              onClick={(e) => handleScrollToSection(e, 'pricing')}
+              className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+            >
+              Pricing
+            </a>
+            <a 
+              href="#faq" 
+              onClick={(e) => handleScrollToSection(e, 'faq')}
+              className="text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+            >
+              FAQ
             </a>
           </div>
         </div>
@@ -74,13 +95,13 @@ export const Navbar = () => {
           {isAuthenticated ? (
             <>
               <Link to="/dashboard">
-                <button className="text-xs font-semibold bg-white hover:bg-neutral-200 text-black px-4 py-1.5 rounded-[2px] transition-all">
+                <button className="text-sm font-medium bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-sm transition-all">
                   Dashboard
                 </button>
               </Link>
               <button 
                 onClick={logout} 
-                className="text-xs font-medium text-neutral-400 hover:text-white px-3 py-1.5 transition-colors"
+                className="text-sm font-medium text-neutral-400 hover:text-white px-3 py-2 transition-colors"
               >
                 Logout
               </button>
@@ -88,12 +109,12 @@ export const Navbar = () => {
           ) : (
             <>
               <Link to="/login" className="hidden sm:block">
-                <button className="text-xs font-medium text-neutral-400 hover:text-white px-3 py-1.5 transition-colors">
+                <button className="text-sm font-medium text-neutral-400 hover:text-white px-3 py-2 transition-colors">
                   Login
                 </button>
               </Link>
               <Link to="/signup">
-                <button className="text-xs font-semibold bg-white hover:bg-zinc-200 text-black px-4 py-1.5 rounded-[2px] transition-all">
+                <button className="text-sm font-medium bg-white/10 hover:bg-white/15 backdrop-blur-xl border border-white/20 text-white px-4 py-2 rounded-sm transition-all">
                   Get Started
                 </button>
               </Link>

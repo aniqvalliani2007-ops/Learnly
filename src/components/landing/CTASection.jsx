@@ -5,68 +5,46 @@ export default function CTASection() {
   const navigate = useNavigate()
 
   return (
-    <section className="relative py-32 bg-black overflow-hidden">
+    <section className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black overflow-hidden">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-indigo-950/20 to-black"></div>
-      <div className="absolute inset-0" style={{
-        backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 70%)'
-      }}></div>
-
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full filter blur-3xl opacity-20"></div>
+      
+      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
         
-        {/* Heading */}
-        <div className="space-y-6 mb-12 animate-fade-in-up">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-            READY TO TRANSFORM
-            <span className="block mt-2 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              YOUR LEARNING?
-            </span>
+        {/* Content */}
+        <div className="p-12 bg-white/5 backdrop-blur-xl border border-white/10 rounded-sm">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Ready to Transform Your Learning?
           </h2>
-          <p className="text-xl sm:text-2xl text-zinc-400 max-w-3xl mx-auto leading-relaxed font-light">
-            Join thousands of students already learning smarter with Learnly
+          <p className="text-lg text-zinc-400 mb-8 max-w-2xl mx-auto">
+            Join thousands of students who are already studying smarter with Learnly. Get started for free today.
           </p>
-        </div>
 
-        {/* CTA Button */}
-        <div className="flex justify-center animate-fade-in-up animation-delay-200">
-          <button
-            onClick={() => navigate('/signup')}
-            className="group relative px-12 py-6 bg-white text-black rounded-full font-bold text-xl hover:bg-zinc-100 transition-all duration-300 hover:scale-105 shadow-2xl shadow-white/20 flex items-center gap-3"
-          >
-            Start For Free
-            <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={() => navigate('/signup')}
+              className="group px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-sm font-medium transition-all flex items-center gap-2"
+            >
+              Start Free Trial
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-3 bg-transparent border border-white/20 hover:border-white/30 text-white rounded-sm font-medium transition-all"
+            >
+              View Pricing
+            </button>
+          </div>
 
-        {/* Subtext */}
-        <p className="text-sm text-zinc-600 mt-8 animate-fade-in-up animation-delay-400">
-          No credit card required • Free plan available • Cancel anytime
-        </p>
+          {/* Trust indicators */}
+          <div className="mt-8 flex flex-wrap justify-center items-center gap-6 text-sm text-zinc-500">
+            <span>✓ No credit card required</span>
+            <span>✓ 3 free uploads</span>
+            <span>✓ Cancel anytime</span>
+          </div>
+        </div>
       </div>
-
-      <style>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 1s ease-out forwards;
-        }
-        .animation-delay-200 {
-          animation-delay: 0.2s;
-          opacity: 0;
-        }
-        .animation-delay-400 {
-          animation-delay: 0.4s;
-          opacity: 0;
-        }
-      `}</style>
     </section>
   )
 }

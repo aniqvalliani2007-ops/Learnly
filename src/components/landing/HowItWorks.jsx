@@ -1,83 +1,79 @@
-import { motion } from 'framer-motion'
-import { UploadCloud, Settings2, BookOpen } from 'lucide-react'
+import { Upload, Brain, Target, TrendingUp } from 'lucide-react'
 
-export const HowItWorks = () => {
-  const steps = [
-    {
-      title: 'Upload Your Material',
-      description: 'Drag and drop any PDF file. Textbooks, lecture slide collections, or research briefs, up to 50MB.',
-      icon: UploadCloud,
-    },
-    {
-      title: 'Configure AI Extraction',
-      description: 'Choose which study methods you want. Toggle between chat assistant, automated quizzes, summaries, or flashcards.',
-      icon: Settings2,
-    },
-    {
-      title: 'Engage & Excel',
-      description: 'Review summaries, take quizzes, run through flashcards, and ask questions to master the materials in half the time.',
-      icon: BookOpen,
-    }
-  ]
+const steps = [
+  {
+    icon: Upload,
+    number: "01",
+    title: "Upload Your Document",
+    description: "Simply drag and drop your PDF or upload it directly. Supports any study material."
+  },
+  {
+    icon: Brain,
+    number: "02",
+    title: "AI Processing",
+    description: "Our advanced AI analyzes your document and extracts key concepts automatically."
+  },
+  {
+    icon: Target,
+    number: "03",
+    title: "Study Materials Generated",
+    description: "Get instant summaries, flashcards, and quizzes tailored to your content."
+  },
+  {
+    icon: TrendingUp,
+    number: "04",
+    title: "Learn & Track Progress",
+    description: "Study with interactive materials and monitor your improvement over time."
+  }
+]
 
+export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-zinc-950 border-y border-white/5 relative">
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+    <section id="how-it-works" className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black">
+      <div className="max-w-6xl mx-auto px-6">
         
-        {/* Section Header */}
+        {/* Section header */}
         <div className="text-center mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight"
-          >
-            How Learnly operates
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mt-5 text-base md:text-lg text-neutral-400 font-sans max-w-2xl mx-auto"
-          >
-            Three simple steps to unlock interactive, high-retention study materials custom tailored to your courses.
-          </motion.p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            How It Works
+          </h2>
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+            Get started in minutes with our simple 4-step process
+          </p>
         </div>
 
-        {/* Steps Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {steps.map((item, index) => {
-            const Icon = item.icon
-            return (
-              <motion.div 
-                key={index} 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-black border border-white/5 p-8 rounded-[4px] relative overflow-hidden group hover:border-primary/50 transition-colors"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[40px] group-hover:bg-primary/20 transition-colors" />
-                
-                <div className="w-12 h-12 rounded-[4px] bg-zinc-900 border border-white/10 flex items-center justify-center mb-8 relative z-10">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
-                    {index + 1}
-                  </div>
+        {/* Steps */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {steps.map((step, index) => (
+            <div key={index} className="relative">
+              {/* Connector line */}
+              {index < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-12 left-[60%] w-full h-px bg-gradient-to-r from-white/20 to-transparent"></div>
+              )}
+              
+              <div className="relative text-center">
+                {/* Number badge */}
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-sm bg-white/5 backdrop-blur-xl border border-white/10 text-zinc-500 font-bold text-sm mb-6">
+                  {step.number}
                 </div>
                 
-                <h3 className="text-xl font-bold text-white tracking-tight mb-3 relative z-10">{item.title}</h3>
-                <p className="text-neutral-400 text-sm leading-relaxed relative z-10">{item.description}</p>
-              </motion.div>
-            )
-          })}
+                {/* Icon */}
+                <div className="w-16 h-16 mx-auto rounded-sm bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mb-5">
+                  <step.icon className="w-8 h-8 text-indigo-400" />
+                </div>
+
+                {/* Content */}
+                <h3 className="text-xl font-semibold text-white mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-zinc-400 leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
-
-export default HowItWorks
-

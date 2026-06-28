@@ -1,98 +1,80 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Minus } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 
-export const FAQSection = () => {
-  const faqs = [
-    { 
-      q: 'What file formats are supported?', 
-      a: 'We currently support PDF files of up to 50MB. This includes textbooks, research documents, lecture slides, scanned articles, and notes. The PDF must have readable text layers for the AI model to perform summaries and quiz creation.' 
-    },
-    { 
-      q: 'How accurate are the AI summaries and quizzes?', 
-      a: 'Our models are powered by state-of-the-art Large Language Models fine-tuned on educational content. The summaries extract the absolute core definitions, while the practice quizzes are custom-aligned to the textbook pages you select, ensuring extremely high factual precision.' 
-    },
-    { 
-      q: 'Is there a free trial plan?', 
-      a: 'Yes, our Basic Free plan provides 5 document uploads per month, access to summary tools, self-study flashcards, and basic chat assistant capabilities. No credit card is required to sign up.' 
-    },
-    { 
-      q: 'Can I cancel my subscription anytime?', 
-      a: 'Absolutely. If you sign up for our Pro Student plan, you can cancel, upgrade, or downgrade your membership directly from your account dashboard. Upon cancellation, you will keep your Pro benefits until the end of your billing cycle.' 
-    },
-  ]
-
-  const [activeIndex, setActiveIndex] = useState(null)
-
-  const toggle = (index) => {
-    setActiveIndex(activeIndex === index ? null : index)
+const faqs = [
+  {
+    question: "How does Learnly work?",
+    answer: "Simply upload your study documents, and our AI will automatically generate comprehensive summaries, flashcards, and quizzes. You can also ask questions about your materials using our study assistant."
+  },
+  {
+    question: "What file formats are supported?",
+    answer: "Currently, we support PDF files. We're working on adding support for more formats including DOCX, TXT, and images in the near future."
+  },
+  {
+    question: "Is my data secure?",
+    answer: "Yes, absolutely. We use industry-standard encryption to protect your data. Your documents and study materials are stored securely and are only accessible by you."
+  },
+  {
+    question: "Can I try Learnly for free?",
+    answer: "Yes! We offer a free plan that allows you to upload up to 3 documents. This lets you experience the core features before deciding to upgrade."
+  },
+  {
+    question: "How accurate is the AI?",
+    answer: "Our AI is highly accurate and continuously improving. It uses advanced natural language processing to understand and extract key concepts from your documents."
+  },
+  {
+    question: "Can I cancel my subscription anytime?",
+    answer: "Yes, you can cancel your subscription at any time. There are no long-term commitments, and you'll retain access until the end of your billing period."
   }
+]
+
+export default function FAQSection() {
+  const [openIndex, setOpenIndex] = useState(null)
 
   return (
-    <section id="faq" className="py-24 bg-black border-y border-white/5 relative">
-      <div className="max-w-3xl mx-auto px-6 relative z-10">
+    <section id="faq" className="relative py-24 bg-black">
+      <div className="max-w-3xl mx-auto px-6">
         
-        {/* Section Header */}
-        <div className="mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="font-sans text-3xl md:text-5xl font-bold text-white tracking-tight"
-          >
+        {/* Section header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Frequently Asked Questions
-          </motion.h2>
+          </h2>
+          <p className="text-lg text-zinc-400">
+            Everything you need to know about Learnly
+          </p>
         </div>
 
-        {/* FAQ List */}
+        {/* FAQ items */}
         <div className="space-y-4">
-          {faqs.map((faq, index) => {
-            const isOpen = activeIndex === index
-            return (
-              <motion.div 
-                key={index} 
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="bg-zinc-900/50 rounded-[4px] border border-white/5 overflow-hidden"
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-sm overflow-hidden"
+            >
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-all"
               >
-                <button
-                  onClick={() => toggle(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
-                >
-                  <span className="text-base font-bold text-white font-sans tracking-tight pr-6">{faq.q}</span>
-                  <div className={`shrink-0 w-6 h-6 rounded-[2px] flex items-center justify-center transition-colors ${isOpen ? 'bg-primary text-white' : 'bg-white/5 text-neutral-400'}`}>
-                    {isOpen ? <Minus className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
-                  </div>
-                </button>
-                
-                <AnimatePresence>
-                  {isOpen && (
-                    <motion.div 
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-6 pt-1">
-                        <p className="text-neutral-400 text-sm leading-relaxed font-sans">
-                          {faq.a}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            )
-          })}
+                <span className="text-lg font-medium text-white pr-8">
+                  {faq.question}
+                </span>
+                <ChevronDown
+                  className={`w-5 h-5 text-zinc-400 flex-shrink-0 transition-transform ${
+                    openIndex === index ? 'transform rotate-180' : ''
+                  }`}
+                />
+              </button>
+              
+              {openIndex === index && (
+                <div className="px-6 pb-5 text-zinc-400 leading-relaxed">
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </section>
   )
 }
-
-export default FAQSection
-
