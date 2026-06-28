@@ -52,8 +52,8 @@ export default function PricingSection() {
   const navigate = useNavigate()
 
   return (
-    <section id="pricing" className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black">
-      <div className="max-w-6xl mx-auto px-6">
+    <section id="pricing" className="relative w-full py-24 bg-gradient-to-b from-black via-zinc-950 to-black">
+      <div className="max-w-6xl mx-auto px-6 w-full">
         
         {/* Section header */}
         <div className="text-center mb-16">

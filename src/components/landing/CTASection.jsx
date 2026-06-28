@@ -5,11 +5,11 @@ export default function CTASection() {
   const navigate = useNavigate()
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-black via-zinc-950 to-black overflow-hidden">
+    <section className="relative w-full py-24 bg-gradient-to-b from-black via-zinc-950 to-black overflow-hidden">
       {/* Background effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full filter blur-3xl opacity-20"></div>
       
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 w-full text-center">
         
         {/* Content */}
         <div className="p-12 bg-white/5 backdrop-blur-xl border border-white/10 rounded-sm">

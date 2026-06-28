@@ -32,8 +32,8 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null)
 
   return (
-    <section id="faq" className="relative py-24 bg-black">
-      <div className="max-w-3xl mx-auto px-6">
+    <section id="faq" className="relative w-full py-24 bg-black">
+      <div className="max-w-3xl mx-auto px-6 w-full">
         
         {/* Section header */}
         <div className="text-center mb-16">
